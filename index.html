@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agile Tester · Flashcard Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#15191E;
+  --ink-soft:#4B5159;
+  --paper:#F5F5F5;
+  --card:#FFFFFF;
+  --line:#E1DFD7;
+  --line-strong:#C9C6BA;
+  --accent:#3B82F6;
+  --accent-deep:#1D4ED8;
+  --accent-tint:#EAF1FE;
+  --good:#22C55E;
+  --good-tint:#E9F9EE;
+  --good-deep:#15803D;
+  --bad:#EF4444;
+  --bad-tint:#FDECEC;
+  --bad-deep:#B91C1C;
+  --amber:#D9A441;
+  --amber-tint:#FBF3E1;
+  --radius-lg:18px;
+  --radius-md:12px;
+  --serif:'Lexend', sans-serif;
+  --sans:'Lexend', sans-serif;
+  --mono:'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;}
+html.dark{
+  --ink:#15191E;
+  --ink-soft:#4B5159;
+  --paper:#000000;
+  --card:#FFFFFF;
+  --line:#E1DFD7;
+  --line-strong:#C9C6BA;
+  --accent:#3B82F6;
+  --accent-deep:#1D4ED8;
+  --accent-tint:#EAF1FE;
+  --good:#22C55E;
+  --good-tint:#E9F9EE;
+  --good-deep:#15803D;
+  --bad:#EF4444;
+  --bad-tint:#FDECEC;
+  --bad-deep:#B91C1C;
+  --amber:#D9A441;
+  --amber-tint:#FBF3E1;
+}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  min-height:100vh;
+  transition:background .3s ease, color .3s ease;
+}
+.bg-texture{
+  position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.5;
+  background-image:radial-gradient(var(--line-strong) 0.6px, transparent 0.6px);
+  background-size:22px 22px;
+  -webkit-mask-image:linear-gradient(to bottom, black, transparent 70%);
+  mask-image:linear-gradient(to bottom, black, transparent 70%);
+}
+.wrap{
+  position:relative; z-index:1;
+  max-width:760px;
+  margin:0 auto;
+  padding:28px 20px 80px;
+}
+
+/* ===== Header ===== */
+.topbar{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+  margin-bottom:22px;
+}
+.brand .eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--accent); margin:0 0 4px;
+}
+.brand h1{
+  font-family:var(--serif); font-weight:500; font-size:26px; margin:0; line-height:1.15;
+}
+.topbtns{display:flex; gap:8px; flex-shrink:0;}
+.iconbtn{
+  width:38px; height:38px; border-radius:50%;
+  border:1px solid var(--line-strong); background:var(--card); color:var(--ink-soft);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  font-size:16px; transition:all .15s ease;
+}
+.iconbtn:hover{ border-color:var(--accent); color:var(--accent); }
+.iconbtn.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+
+/* ===== Progress strip ===== */
+.stats{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+  margin-bottom:14px;
+}
+.stat{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md);
+  padding:10px 12px;
+}
+.stat .num{ font-family:var(--serif); font-size:21px; font-weight:500; line-height:1; }
+.stat .lbl{ font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.07em; margin-top:5px; }
+.stat.correct .num{ color:var(--good-deep); }
+.stat.incorrect .num{ color:var(--bad-deep); }
+.stat.score .num{ color:var(--accent-deep); }
+
+.barwrap{
+  height:6px; background:var(--line); border-radius:4px; overflow:hidden; margin-bottom:30px;
+  display:flex;
+}
+.barseg{ height:100%; transition:width .4s ease; }
+.barseg.done{ background:var(--ink-soft); opacity:.35; }
+.barseg.current{ background:var(--accent); }
+
+/* ===== Card ===== */
+.cardzone{ perspective:1400px; margin-bottom:22px; }
+.card{
+  position:relative;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  padding:30px 28px 26px;
+  box-shadow:0 1px 2px rgba(0,0,0,.04), 0 12px 28px -16px rgba(20,20,15,.18);
+  animation:cardIn .38s cubic-bezier(.2,.8,.2,1);
+}
+html.dark .card{ box-shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 32px -16px rgba(0,0,0,.5); }
+@keyframes cardIn{
+  from{ opacity:0; transform:translateY(10px) scale(.985); }
+  to{ opacity:1; transform:translateY(0) scale(1); }
+}
+.card-top{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:18px; padding-bottom:16px; border-bottom:1px dashed var(--line-strong);
+}
+.qnum{
+  font-family:var(--mono); font-size:12px; color:var(--ink-soft); letter-spacing:.04em;
+}
+.qnum b{ color:var(--ink); font-weight:600; }
+.tagrow{ display:flex; gap:6px; align-items:center; }
+.tag{
+  font-family:var(--mono); font-size:10px; letter-spacing:.06em; text-transform:uppercase;
+  padding:3px 8px; border-radius:20px; border:1px solid var(--line-strong); color:var(--ink-soft);
+}
+.tag.multi{ color:var(--amber); border-color:var(--amber); }
+.bookmark-btn{
+  background:none; border:none; cursor:pointer; font-size:18px; color:var(--line-strong);
+  padding:0 0 0 4px; line-height:1;
+}
+.bookmark-btn.on{ color:var(--amber); }
+
+.question{
+  font-family:var(--serif); font-size:19px; line-height:1.5; font-weight:500;
+  margin:0 0 22px; white-space:pre-line;
+}
+
+.options{ display:flex; flex-direction:column; gap:10px; }
+.opt{
+  display:flex; align-items:flex-start; gap:12px;
+  border:1px solid var(--line-strong); border-radius:var(--radius-md);
+  padding:13px 14px; cursor:pointer; text-align:left;
+  background:var(--card); font-family:var(--sans); font-size:14.5px; line-height:1.5; color:var(--ink);
+  transition:border-color .15s ease, background .15s ease, transform .1s ease;
+}
+.opt:hover:not(.locked){ border-color:var(--accent); background:var(--accent-tint); }
+.opt:active:not(.locked){ transform:scale(.995); }
+.opt .letter{
+  flex-shrink:0; width:24px; height:24px; border-radius:50%;
+  border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:11.5px; font-weight:500; color:var(--ink-soft);
+  transition:all .15s ease;
+}
+.opt .otext{ flex:1; padding-top:1px; }
+.opt .markicon{ flex-shrink:0; width:20px; text-align:center; font-weight:700; opacity:0; transform:scale(.5); transition:all .2s ease; }
+.opt.locked{ cursor:default; }
+.opt.correct{ border-color:var(--good); background:var(--good-tint); }
+.opt.correct .letter{ background:var(--good); border-color:var(--good); color:#fff; }
+.opt.correct .markicon{ opacity:1; transform:scale(1); color:var(--good-deep); }
+.opt.incorrect{ border-color:var(--bad); background:var(--bad-tint); }
+.opt.incorrect .letter{ background:var(--bad); border-color:var(--bad); color:#fff; }
+.opt.incorrect .markicon{ opacity:1; transform:scale(1); color:var(--bad-deep); }
+.opt.faded{ opacity:.5; }
+.opt.selectedMulti{ border-color:var(--accent); background:var(--accent-tint); }
+.opt.selectedMulti .letter{ background:var(--accent); border-color:var(--accent); color:#fff; }
+@keyframes shake{
+  10%,90%{transform:translateX(-1px);} 20%,80%{transform:translateX(2px);}
+  30%,50%,70%{transform:translateX(-4px);} 40%,60%{transform:translateX(4px);}
+}
+.opt.shake{ animation:shake .4s; }
+
+.attempt-note{
+  font-size:12.5px; color:var(--bad-deep); margin-top:10px; font-style:italic;
+  display:none;
+}
+.attempt-note.show{ display:block; }
+
+.controlsrow{ display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
+.btn{
+  font-family:var(--sans); font-size:13.5px; font-weight:500; cursor:pointer;
+  padding:9px 16px; border-radius:30px; border:1px solid var(--line-strong);
+  background:var(--card); color:var(--ink); transition:all .15s ease;
+}
+.btn:hover{ border-color:var(--accent); color:var(--accent-deep); }
+.btn.primary{ background:var(--accent); color:#fff; border-color:var(--accent); }
+.btn.primary:hover{ background:var(--accent-deep); color:#fff; }
+.btn:disabled{ opacity:.4; cursor:not-allowed; }
+.btn:disabled:hover{ border-color:var(--line-strong); color:var(--ink); }
+
+/* ===== Explanation ===== */
+.explain{
+  margin-top:18px; max-height:0; overflow:hidden;
+  transition:max-height .45s cubic-bezier(.2,.8,.2,1), opacity .35s ease, margin .35s ease;
+  opacity:0;
+}
+.explain.open{ max-height:1400px; opacity:1; }
+.explain-inner{
+  background:var(--accent-tint); border-left:3px solid var(--accent);
+  border-radius:0 var(--radius-md) var(--radius-md) 0;
+  padding:16px 18px;
+}
+.explain-title{
+  font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--accent-deep); margin:0 0 10px; display:flex; align-items:center; gap:7px;
+}
+.explain-block{ font-size:14px; line-height:1.65; margin:0 0 10px; }
+.explain-block:last-child{ margin-bottom:0; }
+.explain-block b.opt-letter{
+  font-family:var(--mono); font-weight:700; margin-right:4px;
+}
+.explain-block.is-correct{ color:var(--ink); }
+.explain-block.is-correct b.opt-letter{ color:var(--good-deep); }
+.explain-block.is-wrong b.opt-letter{ color:var(--bad-deep); }
+.explain-block.is-wrong{ color:var(--ink-soft); }
+
+/* ===== Nav ===== */
+.navrow{
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+}
+.navbtn{
+  display:flex; align-items:center; gap:7px;
+  font-family:var(--sans); font-size:14px; font-weight:500; cursor:pointer;
+  padding:11px 18px; border-radius:30px; border:1px solid var(--line-strong);
+  background:var(--card); color:var(--ink); transition:all .15s ease;
+}
+.navbtn:hover:not(:disabled){ border-color:var(--accent); color:var(--accent-deep); background:var(--accent-tint); }
+.navbtn:disabled{ opacity:.35; cursor:not-allowed; }
+.navmid{ font-family:var(--mono); font-size:12.5px; color:var(--ink-soft); }
+.navmid button{
+  background:none; border:none; color:var(--accent); font-family:var(--mono); font-size:12.5px;
+  cursor:pointer; text-decoration:underline; padding:0; margin-left:6px;
+}
+
+/* ===== Review mode ===== */
+.review-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+.review-item{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius-md);
+  padding:14px 16px; cursor:pointer; transition:border-color .15s ease;
+  display:flex; gap:12px; align-items:flex-start;
+}
+.review-item:hover{ border-color:var(--accent); }
+.review-item .ri-badge{
+  flex-shrink:0; width:26px; height:26px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:11px; font-weight:600;
+  background:var(--bad-tint); color:var(--bad-deep); border:1px solid var(--bad);
+}
+.review-item .ri-text{ font-size:13.5px; line-height:1.5; }
+.review-item .ri-text .rq{ color:var(--ink-soft); font-family:var(--mono); font-size:11px; display:block; margin-bottom:3px; }
+.empty-state{
+  text-align:center; padding:50px 20px; color:var(--ink-soft);
+}
+.empty-state .ti{ font-size:34px; display:block; margin-bottom:12px; color:var(--good); }
+
+/* ===== Timer ===== */
+.timer{
+  font-family:var(--mono); font-size:12px; color:var(--ink-soft);
+  display:flex; align-items:center; gap:5px;
+}
+.timer.warn{ color:var(--bad-deep); }
+
+.sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+
+@media (max-width:520px){
+  .wrap{ padding:18px 14px 70px; }
+  .brand h1{ font-size:21px; }
+  .stats{ grid-template-columns:repeat(2,1fr); }
+  .card{ padding:22px 18px 20px; }
+  .question{ font-size:17px; }
+  .navbtn span.label{ display:none; }
+}
+</style>
+</head>
+<body>
+<div class="bg-texture"></div>
+<h1 class="sr-only">ISTQB Agile Tester flashcard quiz with progress tracking, explanations, bookmarks and a review mode for missed questions.</h1>
+
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <p class="eyebrow" id="examEyebrow">CTFL-AT · Practice Set</p>
+      <h1 id="examTitle">Loading exam…</h1>
+    </div>
+    <div class="topbtns">
+      <button class="iconbtn" id="shuffleBtn" title="Shuffle questions"><i class="ti ti-arrows-shuffle"></i></button>
+      <button class="iconbtn" id="reviewBtn" title="Review missed questions"><i class="ti ti-flag"></i></button>
+      <button class="iconbtn" id="darkBtn" title="Toggle dark mode"><i class="ti ti-moon"></i></button>
+    </div>
+  </div>
+
+  <div id="mainArea"></div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css">
+<script id="quiz-data" type="application/json">
+{
+  "title": "ISTQB Agile Tester (CTFL-AT) Full Practice Exam 1",
+  "questions": [
+    {
+      "number": 1,
+      "question": "Which of the following BEST describes the purpose of task management and tracking tools used by Agile testers?",
+      "options": {
+        "A": "To generate test metrics reports and aggregate defect trends across multiple releases",
+        "B": "To create, assign, and monitor testing tasks and their progress throughout the sprint",
+        "C": "To execute automated regression tests and report pass or fail results to the team",
+        "D": "To version control source code and test scripts across multiple branches and iterations"
+      },
+      "correct_answer": "B",
+      "explanation": {
+        "A": "Test metrics aggregation and defect trend reporting across releases are functions of test management or reporting tools, not task management tools. Task management tools track individual task status within a sprint, not cross-release quality trend analysis. This option describes a reporting tool capability, not task management.",
+        "B": "Task management and tracking tools in Agile projects enable testers to create testing tasks, assign them to team members, and monitor their completion status throughout the sprint, supporting visibility and coordination of test activities, as per reference section 3.4.1. These tools provide the operational transparency needed to track testing work alongside development tasks. The other options describe unrelated tool categories.",
+        "C": "Automated test execution and results reporting are functions of test automation frameworks and continuous integration tools, not task management tools. Task management tools track work item status and assignment, not test execution outcomes. This option conflates two distinct Agile tool categories.",
+        "D": "Version control and branch management are functions of configuration management tools, not task management tools. Task management tools focus on work item tracking and sprint coordination, not on source code or artefact versioning. This option misattributes a configuration management function to a task tracking category."
+      }
+    },
+    {
+      "number": 2,
+      "question": "You are reviewing your team's test suite before the start of a new sprint. Several automated test cases cover features that were replaced or significantly modified three iterations ago. A colleague argues that all test cases should be kept permanently since they represent historical coverage. Which action BEST describes how test cases should evolve across multiple iterations in an Agile project?",
+      "options": {
+        "A": "All existing test cases should be deleted at the start of each sprint and recreated to reflect the current sprint content exclusively",
+        "B": "Test cases should only be modified when a defect is reported that the existing suite failed to detect",
+        "C": "Test cases should be reviewed each iteration and updated or retired when the features they cover have changed or been removed",
+        "D": "All test cases must be retained permanently regardless of product changes to preserve complete historical regression coverage"
+      },
+      "correct_answer": "C",
+      "explanation": {
+        "A": "Deleting all test cases each sprint destroys accumulated regression coverage for stable, previously validated features. Regression testing depends on retaining tests for unchanged or stable functionality to detect unintended changes introduced by new development. Wholesale deletion removes the regression protection that the suite provides across iterations.",
+        "B": "Reactive test case modification triggered only by defect escapes is a lagging, post-failure approach to test maintenance. Proactive review and update of test cases during iteration planning ensures the suite remains accurate and comprehensive before defects are introduced. This option defers test case maintenance until after quality has already been compromised.",
+        "C": "Evolving tests across multiple iterations requires regular review to ensure test cases remain aligned with the current product state, and cases covering removed or significantly changed features must be updated or retired to prevent misleading results and unnecessary maintenance overhead, as per reference section 2.2.2. Permanent retention of outdated tests inflates the suite and reduces its reliability as a quality indicator. The other options apply blanket retention or replacement policies inconsistent with sound test management.",
+        "D": "Retaining test cases for features that no longer exist or have been fundamentally changed produces misleading pass or fail results and increases suite maintenance burden without quality benefit. Historical coverage value must be balanced against current product accuracy. Permanent retention prioritises artefact preservation over test effectiveness."
+      }
+    },
+    {
+      "number": 3,
+      "question": "You are a tester on an Agile team that is part of a larger organisation considering how to structure its testing capability. Your manager asks you to explain the organisational options for independent testing in Agile projects. Which option BEST describes a valid organisational approach for independent testing in an Agile context?",
+      "options": {
+        "A": "Testers must be permanently assigned to independent test teams and never embedded within Agile development teams",
+        "B": "A separate independent test team can be engaged for system-level or release-level testing while the embedded tester handles iteration-level testing within the team",
+        "C": "All testing in Agile projects must be performed by developers to maximise integration and eliminate the need for separate testers",
+        "D": "Independent testing must be avoided in Agile projects because it contradicts the whole-team quality ownership principle"
+      },
+      "correct_answer": "B",
+      "explanation": {
+        "A": "The CTFL-AT syllabus describes embedding testers within Agile teams as a primary organisational model for iteration-level testing. Prohibiting embedded testers removes the early, collaborative testing engagement that is fundamental to Agile quality practices. This option describes a strictly sequential test organisation incompatible with Agile integration principles.",
+        "B": "The CTFL-AT syllabus recognises that independent testing in Agile can be structured so that an external test team provides objectivity at higher test levels such as system or release testing, while the embedded tester manages iteration-level activities, as per reference section 2.1.3. This approach balances independence with Agile integration. The other options either eliminate embedded testers or prohibit independent testing without syllabus justification.",
+        "C": "The CTFL-AT syllabus defines a specific tester role within Agile teams and does not advocate developer-only testing. While developers perform unit testing, the tester role contributes distinct skills including independence, domain knowledge, and test technique application. Eliminating dedicated testers would reduce test coverage breadth and objectivity.",
+        "D": "Independent testing is a recognised and valid option in Agile, particularly for higher test levels requiring objectivity that embedded team members may not provide. The whole-team quality principle does not prohibit independent testing; it defines the default team quality responsibility. This option applies an absolute prohibition not supported by the syllabus."
+      }
+    },
+    {
+      "number": 4,
+      "question": "You are a tester who has been embedded in the same Agile development team for eighteen months. Your organisation is reviewing its testing structure and identifies two risks associated with your long-term assignment to a single team. Which TWO of the following represent recognised risks for embedded testers assigned long-term to a single Agile team? (Select TWO)",
+      "options": {
+        "A": "The tester may become too comfortable with team norms and reduce the rigour of defect reporting to maintain team relationships",
+        "B": "The tester may adopt the team's assumptions and lose the critical perspective needed to identify defects objectively",
+        "C": "The tester will accumulate too much domain knowledge and become unable to test new features introduced in the product",
+        "D": "The tester will inevitably automate all manual tests, creating a technical imbalance in the team's skill distribution"
+      },
+      "correct_answer": ["A", "B"],
+      "explanation": {
+        "A": "Prolonged team membership can create social pressure that discourages thorough defect reporting, as testers may soften assessments to preserve interpersonal relationships, as per reference section 2.1.3. This risk directly threatens the objectivity that effective testing requires. It is a recognised consequence of extended team embedding without structural independence safeguards.",
+        "B": "Long-term assignment to a single team creates alignment risk where the tester gradually adopts the team's shared assumptions and blind spots, reducing their ability to evaluate the product with impartiality, as per reference section 2.1.3. This erosion of critical perspective is a documented organisational risk associated with embedded tester independence. Mitigation strategies include periodic rotation or supplemental independent review.",
+        "C": "Domain knowledge accumulation improves testing effectiveness and is not identified as a risk in the CTFL-AT syllabus. Deep domain familiarity enables testers to design more targeted and meaningful tests. This option inverts the actual value of domain expertise by presenting it as an impediment.",
+        "D": "Progressive automation by an experienced tester is a positive contribution, not a documented independence risk associated with long-term assignment. The syllabus does not identify automation skill development as an organisational risk for embedded testers. This option describes a beneficial outcome that is mischaracterised as a structural concern."
+      }
+    },
+    {
+      "number": 5,
+      "question": "You are a tester writing ATDD test cases for a user story covering a hotel room booking feature. The story states: \"As a guest, I want to reserve a room for specific dates so that I am guaranteed accommodation during my stay.\" The acceptance criteria state that a guest cannot book a room that is already reserved for the requested dates. Using the given/when/then format, which test case BEST addresses the acceptance criterion for this story?",
+      "options": {
+        "A": "Given a room is already reserved for the requested dates, when a guest attempts to book that room for the same dates, then the system displays an availability error and prevents the booking",
+        "B": "Given a guest has valid login credentials, when the guest navigates to the booking page, then the booking form is displayed correctly",
+        "C": "Given no rooms are available in the hotel, when a guest attempts any booking, then the system displays a general unavailability message",
+        "D": "Given a guest selects a room, when the booking is confirmed, then a confirmation email is sent to the guest's registered address"
+      },
+      "correct_answer": "A",
+      "explanation": {
+        "A": "This given/when/then test case directly tests the stated acceptance criterion by establishing the precondition of an existing reservation, triggering the booking attempt, and asserting the expected system response of an error message and booking prevention, as per reference section 3.3.3. The test case is specific, executable, and unambiguously derived from the acceptance criterion. The other options either test unrelated conditions or omit the critical precondition.",
+        "B": "This test case tests navigation and form display behaviour, not the acceptance criterion about preventing double bookings. The stated criterion requires testing the conflict detection logic, not the user interface presentation for authenticated users. This option tests an adjacent functional behaviour unrelated to the specific criterion being verified.",
+        "C": "The acceptance criterion specifies a condition where a particular room is reserved for the requested dates, not a scenario where all rooms are unavailable. Generalising the precondition changes the test scenario and may not exercise the targeted reservation conflict detection logic. This option tests a broader scenario that does not directly address the specific acceptance criterion.",
+        "D": "This test case tests the confirmation notification behaviour after a successful booking, not the conflict prevention acceptance criterion. The criterion under test requires validating that an already-reserved room cannot be re-booked, which this test case does not address. This option tests a post-booking workflow step unrelated to the stated acceptance condition."
+      }
+    },
+    {
+      "number": 6,
+      "question": "Which of the following BEST describes the process steps followed in test-driven development?",
+      "options": {
+        "A": "Write a failing test, implement the minimum code to pass the test, then refactor the code while keeping the test passing",
+        "B": "Implement the full feature, write tests to validate it, then review the code with the product owner before committing",
+        "C": "Define acceptance criteria, develop the feature to meet them, then conduct a manual review session before testing",
+        "D": "Create a test plan, assign test cases to developers, and execute them after each sprint review"
+      },
+      "correct_answer": "A",
+      "explanation": {
+        "A": "Test-driven development follows the red-green-refactor cycle: first write a failing test that defines desired behaviour, then write the minimum production code to make the test pass, and finally refactor the code to improve quality while maintaining test passage, as per reference section 3.1.1. This sequence is the defining characteristic of TDD as a development practice. The other options either reverse steps or describe alternative practices.",
+        "B": "Implementing the feature before writing tests describes a test-last approach, not test-driven development. TDD requires the test to exist and fail before production code is written, which is the mechanism by which tests drive design. Writing tests after implementation removes the design influence that defines TDD.",
+        "C": "This sequence describes a general development workflow with acceptance criteria, not the TDD red-green-refactor cycle. TDD is a unit-level technical practice where automated tests drive code implementation, not a story-level workflow incorporating manual review sessions. This option conflates ATDD story-level thinking with TDD's technical micro-cycle.",
+        "D": "Assigning test cases to developers for post-sprint execution describes a traditional test execution workflow, not the TDD development cycle. TDD involves developers writing automated unit tests before production code as a continuous micro-cycle within development, not as a sprint-end activity. This option misrepresents TDD as a planning and execution sequence."
+      }
+    },
+    {
+      "number": 7,
+      "question": "You are a tester working with a business stakeholder who is writing acceptance criteria for a user story covering an online appointment booking feature. The stakeholder has written only functional criteria and asks whether anything else should be included. Which response BEST explains how testable acceptance criteria should be defined for this story?",
+      "options": {
+        "A": "Acceptance criteria should be written by the tester independently after development is complete to reflect actual implemented behaviour",
+        "B": "Acceptance criteria should include both functional behaviour and relevant non-functional constraints such as response time and accessibility requirements to ensure the story is fully testable",
+        "C": "Acceptance criteria should focus exclusively on functional user interactions and exclude all non-functional requirements",
+        "D": "Non-functional requirements should be deferred to the system test phase and excluded from individual story acceptance criteria"
+      },
+      "correct_answer": "B",
+      "explanation": {
+        "A": "Acceptance criteria must be defined collaboratively before development begins, not written independently by the tester after implementation. Post-development tester-authored acceptance criteria describe what was built rather than what was required, eliminating the preventive quality benefit of upfront criteria definition. This option reverses the intended timing and ownership of acceptance criteria authorship.",
+        "B": "Testable acceptance criteria in Agile user stories must address not only functional behaviour but also relevant non-functional requirements such as performance, accessibility, or security constraints that define what \"done\" means for that story, as per reference section 3.3.2. Without non-functional criteria, the story may pass functional verification while failing to meet quality expectations. The other options either restrict criteria to functional aspects or defer non-functional definition inappropriately.",
+        "C": "Excluding non-functional requirements from acceptance criteria creates an incomplete definition of done that may allow the story to be accepted while failing to meet critical quality attributes. Non-functional requirements relevant to the story must be expressed as testable criteria to ensure they are verified alongside functional behaviour. This option produces a partial and insufficient acceptance basis.",
+        "D": "Deferring non-functional verification to a separate system test phase reintroduces a sequential quality gate that prevents iterative validation of non-functional attributes. Non-functional criteria relevant to individual stories should be verified within the sprint as part of the definition of done. Late-stage non-functional testing increases risk and reduces the team's ability to address quality gaps early."
+      }
+    },
+    {
+      "number": 8,
+      "question": "You are preparing test activities for a sprint that includes a user story for a funds transfer feature in a banking application. The available test basis includes the user story, acceptance criteria, a data flow diagram produced during refinement, and notes from the story's three amigos session. Which action BEST reflects how you should interpret and use these test basis sources to support testing activities?",
+      "options": {
+        "A": "Use only the user story title and defer test design until the developer provides a technical specification",
+        "B": "Limit test design to the acceptance criteria only and disregard the data flow diagram and refinement notes",
+        "C": "Request that the product owner rewrite the user story as a formal test specification before deriving any test conditions",
+        "D": "Use all available test basis sources together to derive comprehensive test conditions that cover functional behaviour, data flows, and edge cases identified during refinement"
+      },
+      "correct_answer": "D",
+      "explanation": {
+        "A": "Waiting for a technical specification before designing tests is a sequential, plan-driven approach that contradicts the Agile practice of using available test basis artefacts to begin test preparation during the sprint. The user story, acceptance criteria, and refinement notes are sufficient starting points for initial test condition identification. Deferring test design reduces the time available for test execution within the sprint.",
+        "B": "Restricting the test basis to acceptance criteria alone ignores supplementary information from the data flow diagram and refinement session that may reveal additional test conditions not explicitly captured in the acceptance criteria. Comprehensive test design requires interpreting all relevant test basis sources. Limiting the basis increases the risk of missing edge cases and data flow defects.",
+        "C": "Transforming user stories into formal test specifications is not an Agile test preparation practice and would introduce unnecessary overhead and delay. User stories and their associated artefacts serve as the test basis in Agile projects, and the tester's role is to interpret these sources as they exist, not to request their transformation into traditional test documentation.",
+        "D": "The tester's responsibility when interpreting relevant information is to use all available test basis sources, including the user story, acceptance criteria, supporting technical artefacts, and refinement notes, to derive a complete set of test conditions that address functional, data, and boundary scenarios, as per reference section 3.3.1. Using multiple sources together ensures that test coverage reflects all agreed and documented expectations. The other options restrict the test basis inappropriately or defer test design."
+      }
+    },
+    {
+      "number": 9,
+      "question": "You are a tester designing test cases for a user story describing a temperature alert feature. The story states that an alert is triggered when the temperature reading is below zero degrees or above fifty degrees. Readings from zero to fifty degrees inclusive generate no alert. Using equivalence partitioning and boundary value analysis, which set of test values BEST covers the defined partitions and their boundaries?",
+      "options": {
+        "A": "Test all integer values from -5 to 55 to ensure complete coverage of all possible alert conditions",
+        "B": "Test with values -1, 0, 25, 50, and 51 to cover the below-zero boundary, the within-range partition, and the above-fifty boundary",
+        "C": "Test with values 0, 25, and 50 only to confirm the no-alert partition is handled correctly",
+        "D": "Test with values -10, 30, and 60 as representative samples from each of the three partitions"
+      },
+      "correct_answer": "B",
+      "explanation": {
+        "A": "Exhaustive testing of all values in the range is unnecessary when equivalence partitioning and boundary value analysis can achieve equivalent defect detection with a significantly smaller, targeted test set. These techniques are specifically designed to reduce test volume while maintaining defect detection effectiveness. This option ignores both techniques and proposes exhaustive input enumeration.",
+        "B": "This value set applies both equivalence partitioning and boundary value analysis: -1 and 0 cover the lower boundary between the alert and no-alert partitions, 25 represents the valid no-alert partition, and 50 and 51 cover the upper boundary between the no-alert and alert partitions, as per reference section 3.3.4. This combination provides coverage of all three partitions and both critical boundaries. The other options omit boundaries or test only mid-partition values.",
+        "C": "Testing only within the valid no-alert partition misses the boundary values adjacent to the alert trigger thresholds, which are the locations most likely to reveal off-by-one defects. Boundary value analysis specifically requires testing at and adjacent to partition boundaries. This option applies equivalence partitioning without the complementary boundary coverage.",
+        "D": "Selecting mid-partition representatives without testing boundary values omits the test conditions most likely to expose defects in the boundary logic. The boundaries at zero and fifty are the critical decision points where implementation errors are most probable. This option provides partition coverage but omits boundary analysis entirely."
+      }
+    },
+    {
+      "number": 10,
+      "question": "You are part of a team using two-week sprints that includes stakeholder reviews at the end of each iteration. Consider the following statements about continuous feedback in sprints:\nI. Continuous feedback reduces the risk of delivering features that do not meet stakeholder expectations.\nII. Sprint reviews should be eliminated once the team reaches a stable velocity.\nIII. Continuous feedback allows the team to adjust priorities based on demonstrated product behaviour.\nIV. Feedback collected only at the end of a release is sufficient to manage product quality in Agile projects.\nWhich of the following statements are CORRECT?",
+      "options": {
+        "A": "III and IV",
+        "B": "I and III",
+        "C": "I and II",
+        "D": "II and IV"
+      },
+      "correct_answer": "B",
+      "explanation": {
+        "A": "Statement IV is false; relying solely on release-end feedback defeats the purpose of iterative development by deferring quality validation until too late for cost-effective correction. Statement III is correct, but pairing it with the incorrect statement IV produces an invalid answer. This combination partially recognises Agile feedback value but includes a contradicting principle.",
+        "B": "Continuous feedback reduces the risk of unmet expectations by enabling early course correction, and it allows the team to adjust priorities based on observed product behaviour across sprints, as per reference section 1.1.3. Statement II is incorrect because sprint reviews are a structural Agile ceremony that should not be eliminated regardless of velocity. Statement IV is incorrect because end-of-release feedback is insufficient to support iterative quality management. Only I and III are valid.",
+        "C": "Statement II is false; sprint reviews are a required Agile ceremony and should not be removed once velocity stabilises. Eliminating sprint reviews would break the feedback loop that is fundamental to Agile delivery. This combination accepts an incorrect statement and produces an invalid pair.",
+        "D": "Both statement II and statement IV are false. Sprint reviews must be retained throughout the project, and end-of-release feedback alone is insufficient for managing quality in an iterative development model. This combination selects two incorrect statements and represents a fundamental misunderstanding of Agile feedback principles."
+      }
+    },
+    {
+      "number": 11,
+      "question": "You are a tester classifying a set of testing activities for your sprint. The activities include usability testing sessions with end users and performance testing under load. Your test lead asks you to identify which testing quadrants these activities belong to. Which statement BEST describes the relationship between testing quadrants Q3 and Q4 and their associated testing types?",
+      "options": {
+        "A": "Q3 contains automated performance tests while Q4 contains manual exploratory testing sessions",
+        "B": "Q3 and Q4 both contain development-support tests used by developers to verify technical code quality",
+        "C": "Q4 contains business-facing user acceptance tests while Q3 contains technology-facing load and stress tests",
+        "D": "Q3 contains business-facing tests that critique the product, such as usability and exploratory testing, while Q4 contains technology-facing tests that critique the product, such as performance and security testing"
+      },
+      "correct_answer": "D",
+      "explanation": {
+        "A": "Performance tests are technology-facing and belong to Quadrant 4, not Q3. Manual exploratory testing is business-facing and belongs to Quadrant 3, not Q4. This option reverses the assignments of both quadrants, producing an entirely incorrect classification of the critique-oriented test types.",
+        "B": "Development-support tests are the function of Quadrants 1 and 2, not Q3 and Q4. Quadrants 3 and 4 are critique-oriented, assessing the product's suitability from business and technical perspectives rather than supporting its internal construction. This option misidentifies the orientation of the upper two quadrants.",
+        "C": "User acceptance tests are business-facing and belong to Quadrant 3, not Q4. Load and stress tests are technology-facing and belong to Quadrant 4, not Q3. This option reverses the business and technology dimension assignments across Q3 and Q4.",
+        "D": "Quadrant 3 comprises business-facing critique tests such as usability testing, exploratory testing, and user acceptance testing that evaluate the product from a stakeholder or end-user perspective, while Quadrant 4 contains technology-facing critique tests such as performance, load, and security testing that evaluate non-functional product characteristics, as per reference section 3.1.3. Both quadrants assess product quality rather than supporting its construction. The other options misassign test types or reverse the business versus technology dimension."
+      }
+    },
+    {
+      "number": 12,
+      "question": "You are working on an Agile project where development and testing activities run in parallel throughout each sprint. A new team member asks how this integrated approach differs from what they experienced in a traditional project. Which statement BEST describes how development and testing activities are integrated in Agile projects?",
+      "options": {
+        "A": "Development is completed in the first half of the sprint and testing is performed exclusively in the second half to maintain a clean separation of activities",
+        "B": "Testers receive fully developed user stories from developers and perform independent testing without collaboration to preserve objectivity",
+        "C": "Development and testing activities are integrated only during the final sprint of a release to ensure all features are tested simultaneously",
+        "D": "Testing activities begin as soon as stories enter development within the iteration, with testers and developers collaborating on acceptance criteria and defect resolution throughout the sprint"
+      },
+      "correct_answer": "D",
+      "explanation": {
+        "A": "Splitting a sprint into discrete development and testing halves reintroduces a sequential, phase-gated structure within the iteration, which contradicts the integrated Agile model. Agile integration requires development and testing to overlap and inform each other throughout the sprint. This option describes a mini-waterfall approach that defeats the continuous collaboration benefit of Agile.",
+        "B": "Performing testing in isolation from developers contradicts the whole-team collaboration model central to Agile integration. While objectivity is a valid testing concern, Agile projects balance independence with collaboration, particularly for unit and integration-level verification within the team. Fully independent testing without collaboration removes the early defect prevention benefit of integrated working.",
+        "C": "Integration of development and testing is a continuous practice throughout every sprint in an Agile project, not a release-end activity. Restricting integration to the final sprint is a sequential release approach that eliminates the iterative quality benefits of Agile development. This option describes a batch integration model incompatible with Agile principles.",
+        "D": "In Agile projects, testing is integrated with development from the start of each sprint, with testers actively collaborating on acceptance criteria clarification and participating in defect resolution as development progresses, as per reference section 2.1.2. This concurrent model produces shared work products across business, development, and test categories within the same iteration. The other options describe sequential or role-separated approaches inconsistent with Agile integration."
+      }
+    },
+    {
+      "number": 13,
+      "question": "You are a tester preparing for iteration planning on a sprint that includes a new patient data management feature for a healthcare application. The feature involves storing sensitive medical records, integrating with an existing patient lookup service, and meeting regulatory data retention requirements. Which approach BEST reflects how quality risks should be identified and assessed for this feature during iteration planning?",
+      "options": {
+        "A": "Assess only the technical complexity of each risk area and disregard the potential consequences for patients",
+        "B": "Assign equal testing effort to all three risk areas to avoid introducing bias into the assessment",
+        "C": "Evaluate both the likelihood of failure and the business impact for each risk area, then prioritise testing effort toward the highest combined risk",
+        "D": "Focus testing effort exclusively on the integration point with the patient lookup service and defer all other risk areas"
+      },
+      "correct_answer": "C",
+      "explanation": {
+        "A": "Quality risk assessment requires both dimensions: technical likelihood and business or patient impact. Disregarding patient consequences for a healthcare feature with sensitive data and regulatory obligations produces an incomplete risk picture that may critically underprioritise high-impact failure scenarios. One-dimensional technical assessment is insufficient for effective risk-based testing.",
+        "B": "Equal effort allocation ignores the differential risk profiles of the three areas and misuses testing capacity by applying the same effort to high-risk and low-risk areas alike. Risk-based testing requires effort to be proportional to the assessed combination of likelihood and impact. Uniform effort allocation is a risk-neutral approach that contradicts quality risk assessment principles.",
+        "C": "Quality risk assessment in Agile requires evaluating each identified risk on two dimensions: the probability of failure occurrence and the severity of the business impact if failure occurs, as per reference section 3.2.1. Applying both dimensions to the sensitive data storage, service integration, and regulatory compliance risks enables the tester to allocate testing effort proportionally to the most critical areas. The other options apply partial or incorrect risk assessment approaches.",
+        "D": "Focusing exclusively on the integration risk ignores the regulatory compliance and sensitive data storage risks, which may carry higher business impact. Quality risk assessment requires all identified risk areas to be evaluated before effort is prioritised. Selective focus without a full risk assessment may leave high-impact risks undertested."
+      }
+    },
+    {
+      "number": 14,
+      "question": "You are a tester on an Agile team that releases working software at the end of every two-week sprint. A senior developer argues that stakeholder feedback sessions are consuming too much time and suggests reducing them to once per quarter. Which benefit of early feedback BEST supports maintaining the current sprint-level feedback cadence?",
+      "options": {
+        "A": "Frequent stakeholder feedback enables the team to detect product misalignments early and incorporate corrections before significant effort is misdirected",
+        "B": "Frequent feedback sessions allow the team to skip regression testing since defects are caught by stakeholders directly",
+        "C": "Reducing feedback frequency improves team velocity by eliminating non-development activities from the sprint",
+        "D": "Early feedback ensures the product owner can approve all test cases before sprint execution begins"
+      },
+      "correct_answer": "A",
+      "explanation": {
+        "A": "Early and frequent feedback in Agile allows misalignments between stakeholder expectations and product behaviour to be identified and corrected within short cycles, significantly reducing the cost and effort of rework, as per reference section 1.1.3. Reducing feedback to quarterly cycles would allow misalignments to accumulate over multiple sprints before discovery. The other options mischaracterise the purpose or benefit of the feedback mechanism.",
+        "B": "Stakeholder feedback sessions focus on product alignment and feature acceptance, not on defect discovery through formal test execution. Regression testing addresses internal code stability concerns that stakeholder reviews cannot substitute for. This option incorrectly equates two distinct quality activities.",
+        "C": "Stakeholder feedback sessions are a defined part of the Agile delivery cycle and contribute directly to quality outcomes by validating product direction. Removing feedback to increase velocity would optimise for output quantity while sacrificing product quality and stakeholder alignment. This option prioritises short-term throughput over sustainable value delivery.",
+        "D": "Stakeholder feedback collected at sprint reviews informs future sprint content, not test case approval for the current sprint. Test case design and approval are internal team activities that occur independently of stakeholder feedback sessions. This option confuses two unrelated Agile activities."
+      }
+    },
+    {
+      "number": 15,
+      "question": "Which of the following BEST identifies a role defined within the Scrum framework?",
+      "options": {
+        "A": "Release Manager",
+        "B": "Test Lead",
+        "C": "Business Analyst",
+        "D": "Product Owner"
+      },
+      "correct_answer": "D",
+      "explanation": {
+        "A": "Release Manager is not a defined Scrum role; it is a role associated with traditional project or operations management. Scrum defines three specific roles: Product Owner, Scrum Master, and development team member. Introducing a Release Manager as a Scrum role reflects a misunderstanding of the framework's role structure.",
+        "B": "Test Lead is not a defined role within the Scrum framework. Scrum does not prescribe specialised functional roles such as test lead or development lead within the team. Team members in Scrum are cross-functional contributors without formal specialisation titles defined by the framework.",
+        "C": "Business Analyst is not a role defined within the Scrum framework. While individuals with analytical skills may participate in Scrum teams, Scrum itself does not recognise or define a Business Analyst role. This option reflects a traditional project management role structure not applicable to Scrum.",
+        "D": "The Product Owner is one of the three defined roles in the Scrum framework, responsible for managing the product backlog and representing stakeholder interests, as per reference section 1.2.1. This role is explicitly named in the Scrum framework alongside the Scrum Master and the development team. The other options describe roles from different frameworks or organisational structures not defined within Scrum."
+      }
+    },
+    {
+      "number": 16,
+      "question": "You are a tester on a team that recently implemented a continuous integration pipeline. After several weeks, the team notices that developers are committing code less frequently because they fear triggering a failed build. A test manager asks you to identify the risk this behaviour represents for continuous integration. Which response BEST describes a recognised risk or challenge associated with continuous integration?",
+      "options": {
+        "A": "Infrequent commits improve continuous integration quality by reducing the number of build triggers and minimising pipeline congestion",
+        "B": "The risk of continuous integration is limited to test execution time, which can be resolved by running tests less frequently",
+        "C": "Infrequent code commits undermine continuous integration by reducing feedback frequency and allowing integration problems to accumulate before discovery",
+        "D": "The primary risk of continuous integration is that automated tests replace the need for manual exploratory testing"
+      },
+      "correct_answer": "C",
+      "explanation": {
+        "A": "Infrequent commits do not improve CI quality; they reduce the feedback granularity that CI is designed to provide. Each commit that is deferred represents an integration verification opportunity lost, increasing the batch size of unverified changes. Pipeline congestion from frequent commits is manageable, while accumulated unverified changes represent a significant integration risk.",
+        "B": "Running tests less frequently in a CI pipeline directly undermines its purpose of providing rapid quality feedback on each commit. Reducing test frequency to address execution time sacrifices the core CI benefit in exchange for speed, which is the inverse of the correct approach. The scenario's risk is behavioural, not related to test execution duration.",
+        "C": "The value of continuous integration depends on frequent code commits that trigger automated builds and tests, providing rapid feedback on integration quality, as per reference section 1.2.4. When developers reduce commit frequency out of fear of build failures, integration defects accumulate undetected, defeating the early detection purpose of CI. The other options either describe unrelated CI challenges or misidentify the impact of reduced commit frequency.",
+        "D": "Continuous integration pipelines execute automated checks but do not eliminate the need for manual exploratory testing, which serves a distinct quality purpose. The identified risk in the scenario is reduced commit frequency causing integration defect accumulation, not the scope of automated test coverage. This option misidentifies both the risk and the relationship between CI and exploratory testing."
+      }
+    },
+    {
+      "number": 17,
+      "question": "You are a tester on an Agile team where quality ownership is distributed across team members. Your test lead explains that testers in Agile teams take on coaching and quality ownership responsibilities beyond traditional test execution. Which TWO of the following activities BEST reflect the coaching and quality ownership responsibilities of a tester in an Agile team? (Select TWO)",
+      "options": {
+        "A": "Guiding developers on how to write effective unit tests to improve the team's overall test coverage",
+        "B": "Executing all performance and security testing independently without involving the development team to preserve test objectivity",
+        "C": "Documenting all test results in a formal test report and submitting it to the project manager after each sprint",
+        "D": "Facilitating a discussion with the team on improving the definition of done to include additional quality criteria"
+      },
+      "correct_answer": ["A", "D"],
+      "explanation": {
+        "A": "Agile testers are expected to coach team members on test techniques and quality practices, including unit test design, as per reference section 2.3.2. This coaching activity directly reflects the quality ownership dimension of the Agile tester role.",
+        "B": "Performing all non-functional testing in isolation from the development team contradicts the whole-team quality ownership model. Agile quality responsibilities are shared, and non-functional testing is most effective when developers contribute their technical understanding alongside the tester's test design skills. This option misrepresents objectivity as a justification for role isolation.",
+        "C": "Submitting formal test reports to a project manager is a traditional reporting activity not characteristic of the Agile tester's coaching and quality ownership role. Agile testers communicate quality status through team-facing mechanisms such as task boards and standups, not through formal upward reporting.",
+        "D": "Facilitating improvements to the definition of done is a quality ownership activity that enables the tester to embed higher quality standards into the team's shared acceptance of story completion, as per reference section 2.3.2. This responsibility reflects the collaborative, team-wide quality ownership model in Agile."
+      }
+    },
+    {
+      "number": 18,
+      "question": "You are a tester joining an Agile team at the start of a new project. The team is about to begin its first sprint, which the team refers to as sprint zero. The Scrum Master asks you to describe what testing-related activities you should perform during this initial sprint. Which action BEST reflects the tester's role during sprint zero in a Scrum team?",
+      "options": {
+        "A": "Wait for the development team to complete all sprint zero tasks before contributing any testing activities",
+        "B": "Document the complete test plan for all planned sprints and obtain product owner approval before sprint one begins",
+        "C": "Establish the initial test environment, define the test approach, and identify potential quality risks for the product backlog",
+        "D": "Begin executing test cases for the highest-priority user stories in the product backlog immediately"
+      },
+      "correct_answer": "C",
+      "explanation": {
+        "A": "Passively waiting for development team completion contradicts the whole-team approach and the tester's specific sprint zero responsibilities. The tester has defined preparatory activities including environment setup and risk identification that run in parallel with development preparation tasks. Waiting removes the tester's proactive contribution during the critical project setup phase.",
+        "B": "Producing a complete multi-sprint test plan before the first delivery sprint contradicts the iterative, just-in-time planning approach of Agile. Agile testers establish a high-level test approach during sprint zero but refine planning iteratively as sprint content becomes known. Comprehensive upfront planning followed by formal approval is a sequential lifecycle practice.",
+        "C": "During sprint zero, the tester's role in a Scrum team includes setting up the test environment, defining the test strategy and approach, and conducting an initial quality risk assessment against the product backlog, as per reference section 3.1.4. These preparatory activities enable the team to execute testing effectively from the first delivery sprint. The other options either defer essential setup activities or assign sprint zero responsibilities inappropriately.",
+        "D": "Sprint zero is a preparation phase for establishing infrastructure, tooling, and approach, not a delivery sprint where test execution against user stories begins. User stories are not typically implemented in sprint zero; test execution against backlog stories commences from the first delivery sprint. This option misapplies execution-phase activities to the preparatory sprint."
+      }
+    },
+    {
+      "number": 19,
+      "question": "You are collaborating with a business stakeholder to define acceptance criteria for a user story covering a patient medication scheduling feature. The story involves validating prescription business rules, displaying scheduled medication timings, and integrating with a pharmacy dispensing interface. Which TWO of the following should be included as acceptance criteria for this story? (Select TWO)",
+      "options": {
+        "A": "The development team must complete the medication scheduling feature within the current sprint to avoid regulatory penalties",
+        "B": "The system must reject a medication schedule where the prescribed dosage interval violates the minimum safe frequency defined by the clinical business rules",
+        "C": "The product owner must personally validate all scheduled medication timings against the original prescription before sprint sign-off",
+        "D": "The system must display a timeout error and allow the user to retry when the pharmacy dispensing interface does not respond within an acceptable period"
+      },
+      "correct_answer": ["B", "D"],
+      "explanation": {
+        "A": "Sprint delivery timelines and regulatory penalty avoidance are project management concerns, not testable acceptance criteria for the story. Acceptance criteria define verifiable system behaviour, not delivery schedule commitments.",
+        "B": "Business rule validation governing safety-critical constraints must be expressed as explicit, testable acceptance criteria to ensure the system enforces correct clinical logic. This criterion is specific, verifiable, and directly tied to a defined business rule applicable to the story scope.",
+        "C": "Product owner review activities are a governance practice, not an acceptance criterion for system behaviour. Acceptance criteria describe what the system must do, not the approval workflow.",
+        "D": "Acceptance criteria for stories involving external system interfaces must address failure scenarios and non-functional behaviour such as error handling. This criterion covers both interface integration behaviour and a measurable non-functional expectation, making it specific and testable within the story's scope."
+      }
+    },
+    {
+      "number": 20,
+      "question": "Which of the following combinations contains only principles from the Agile Manifesto?\nI. Deliver working software frequently, with a preference for shorter timescales.\nII. Build projects around motivated individuals and give them the support they need.\nIII. Maximise the work done by ensuring every requirement is fully specified before development.\nIV. Welcome changing requirements, even late in development.",
+      "options": {
+        "A": "I and III only",
+        "B": "I, II, and IV",
+        "C": "I, III, and IV",
+        "D": "II, III, and IV"
+      },
+      "correct_answer": "B",
+      "explanation": {
+        "A": "Statement III is not an Agile Manifesto principle and is incompatible with Agile values. This combination excludes statement II, which is a valid principle about motivated individuals, and includes a non-manifesto statement. Accepting this combination requires rejecting two correctly identified Agile principles.",
+        "B": "Delivering working software frequently, building projects around motivated individuals, and welcoming changing requirements are all established Agile Manifesto principles, as per reference section 1.1.1. Statement III contradicts the manifesto by advocating for exhaustive upfront specification, which conflicts with the Agile principle of adaptive planning. Only I, II, and IV accurately reflect manifesto principles.",
+        "C": "Statement III describes maximising work done through full upfront specification, which directly contradicts the Agile principle that values simplicity and the art of maximising work not done. Selecting this combination requires accepting a principle that opposes Agile values. Statement III is characteristic of a plan-driven, sequential approach.",
+        "D": "Statement III is not an Agile Manifesto principle and contradicts the manifesto's emphasis on simplicity and iterative delivery over exhaustive upfront specification. Including statement III alongside valid Agile principles produces an incorrect and internally inconsistent combination. This option conflates a sequential lifecycle rule with Agile principles."
+      }
+    },
+    {
+      "number": 21,
+      "question": "You are a tester reviewing the testing strategy for an upcoming sprint. Your test lead explains that the team's unit tests and component integration tests belong to the lower quadrants of the testing quadrant model. Which statement BEST describes the relationship between testing quadrants Q1 and Q2 and their associated testing types?",
+      "options": {
+        "A": "Q1 contains technology-facing tests that support the team, such as unit and component tests, while Q2 contains business-facing tests that support the team, such as functional and story tests",
+        "B": "Q1 contains business-facing acceptance tests while Q2 contains technology-facing performance and security tests",
+        "C": "Q1 and Q2 both contain critique-oriented tests designed to evaluate product quality from a user perspective",
+        "D": "Q2 contains automated unit tests while Q1 contains manual exploratory testing sessions"
+      },
+      "correct_answer": "A",
+      "explanation": {
+        "A": "Quadrant 1 comprises technology-facing tests that support the development team by validating technical correctness at the code level, and Quadrant 2 comprises business-facing tests that support the team by verifying functional behaviour against user stories and acceptance criteria, as per reference section 3.1.3. Both quadrants are support-oriented and drive development, distinguishing them from the critique-oriented quadrants. The other options misassign test types or invert the business versus technology dimension.",
+        "B": "Acceptance tests are business-facing and belong to Quadrant 2, not Q1. Performance and security tests are technology-facing critique tests that belong to Quadrant 4, not Q2. This option reverses the business and technology dimensions across both quadrants, producing an entirely incorrect classification.",
+        "C": "Q1 and Q2 are both support-oriented quadrants that help the team build the product correctly, not critique it. Critique-oriented testing that evaluates the product from an external or user perspective is the function of Quadrants 3 and 4. This option misidentifies the orientation of the lower two quadrants.",
+        "D": "Unit tests belong to Q1 as technology-facing development support tests, not Q2. Exploratory testing is a business-facing, manual critique activity associated with Quadrant 3, not Q1. This option reverses the test type assignments within Q1 and Q2 and misattributes exploratory testing to the wrong quadrant."
+      }
+    },
+    {
+      "number": 22,
+      "question": "You are participating in a sprint retrospective after a sprint in which several high-priority defects were found during the last two days of testing. The team is discussing what process changes should result from this retrospective. Which action BEST reflects a valid retrospective outcome and appropriate follow-up in an Agile project?",
+      "options": {
+        "A": "The team documents the defects in a shared log and presents the log to management at the next programme review",
+        "B": "The team agrees to increase the sprint length by one week to provide more time for testing in future sprints",
+        "C": "The tester is assigned responsibility for preventing late defect discovery by reviewing all code changes before commit",
+        "D": "The team commits to shifting test activities earlier in the sprint and assigns a team member to track progress in the next iteration"
+      },
+      "correct_answer": "D",
+      "explanation": {
+        "A": "Documenting defects for management review is a reporting activity, not a retrospective improvement action. Retrospective outcomes must be team-owned process changes implemented within the next iteration, not escalation artefacts for external audiences. This option treats the retrospective as a reporting ceremony rather than an improvement mechanism.",
+        "B": "Sprint length is a structural decision that requires broader agreement and is not a typical retrospective output. Retrospective improvements focus on changing how the team works within the existing sprint structure, not on altering the structure itself. This option substitutes a structural change for the process improvement that the retrospective is designed to produce.",
+        "C": "Assigning sole responsibility to the tester for code review before commit misrepresents both the tester role and the shared quality responsibility model in Agile. Retrospective improvements should enhance team-wide processes, not concentrate responsibility in a single role. This option contradicts the whole-team quality ownership principle.",
+        "D": "A retrospective outcome must be a specific, actionable improvement commitment with an assigned owner and a follow-up mechanism, which is exactly what shifting testing earlier and assigning tracking responsibility provides, as per reference section 1.2.3. This outcome addresses the root cause identified and establishes accountability for implementation. The other options either produce non-actionable outputs or bypass the team-owned improvement model."
+      }
+    },
+    {
+      "number": 23,
+      "question": "You are a tester who has recently moved from a sequential development lifecycle to an Agile project. Your manager asks you to explain a key difference between testing activities in the two environments. Which statement BEST describes a difference between testing in Agile projects and testing in non-Agile projects?",
+      "options": {
+        "A": "In Agile projects, testers collaborate with developers throughout each iteration rather than receiving completed software at a defined test phase",
+        "B": "In Agile projects, all testing is deferred until the final sprint to ensure the product is feature-complete before verification begins",
+        "C": "In non-Agile projects, testers are embedded within the development team and contribute to story refinement alongside developers",
+        "D": "Agile projects eliminate the need for structured test levels by replacing them with exploratory testing sessions in each sprint"
+      },
+      "correct_answer": "A",
+      "explanation": {
+        "A": "A defining difference between Agile and sequential testing is that Agile integrates testers into the development process throughout each iteration, enabling continuous collaboration, rather than receiving completed builds at a separate, phase-gated test stage, as per reference section 2.1.1. This integration supports earlier defect detection and shared quality ownership. The other options either describe sequential lifecycle characteristics or misattribute Agile testing behaviours.",
+        "B": "Deferring all testing to the final sprint is a characteristic of sequential, phase-gated lifecycles, not Agile projects. Agile testing occurs continuously throughout each iteration alongside development. Late-stage testing in Agile would negate the early feedback benefits that iterative delivery provides.",
+        "C": "Embedding testers within the development team and involving them in story refinement is an Agile practice, not a characteristic of non-Agile sequential lifecycles. In sequential projects, testers typically operate in a separate, phase-sequential test team that receives work after development phases complete. This option reverses the defining characteristics of the two lifecycle types.",
+        "D": "Agile projects retain structured test levels, including unit, integration, and system testing, which are executed concurrently within iterations rather than in sequential phases. Exploratory testing complements but does not replace structured test levels. This option incorrectly attributes a test level elimination to Agile development."
+      }
+    },
+    {
+      "number": 24,
+      "question": "Which of the following BEST describes a value stated in the Agile Manifesto?",
+      "options": {
+        "A": "Working software over comprehensive documentation",
+        "B": "Comprehensive documentation over working software",
+        "C": "Following a plan over responding to change",
+        "D": "Contract negotiation over customer collaboration"
+      },
+      "correct_answer": "A",
+      "explanation": {
+        "A": "\"Working software over comprehensive documentation\" is one of the four core values explicitly stated in the Agile Manifesto, as per reference section 1.1.1. This value prioritizes delivering functional software above producing extensive written artefacts, reflecting the Agile preference for tangible outcomes over process overhead. The remaining options either invert manifesto values or introduce statements not present in the manifesto.",
+        "B": "This statement directly inverts the Agile Manifesto value, which places working software above documentation. The manifesto acknowledges documentation has value but explicitly deprioritizes it relative to functional software delivery. This option represents the traditional, plan-driven approach that Agile was designed to challenge.",
+        "C": "The Agile Manifesto values responding to change over following a plan, not the reverse. This option inverts the stated manifesto value by elevating plan adherence above adaptability. The manifesto explicitly recognises that change is beneficial and must be accommodated throughout delivery.",
+        "D": "The Agile Manifesto values customer collaboration over contract negotiation, not the reverse. This option misrepresents the manifesto by prioritising formal contractual arrangements above ongoing stakeholder engagement. The correct value emphasises continuous collaboration with customers as superior to contractual obligations."
+      }
+    },
+    {
+      "number": 25,
+      "question": "You are a tester joining a new Agile team. During your first sprint, you notice that developers, the product owner, and the tester all attend backlog refinement and contribute to defining acceptance criteria. A colleague from a previous organisation questions why testing is involved so early. Which benefit of the whole-team approach BEST justifies this practice?",
+      "options": {
+        "A": "Tester involvement in refinement is only necessary when the product owner is unavailable to review stories",
+        "B": "Developers benefit from tester involvement in refinement by receiving completed test cases before coding begins",
+        "C": "The whole-team approach requires testers to approve user stories before they are added to the backlog",
+        "D": "Involving the tester during refinement improves story quality by identifying testability issues before development begins"
+      },
+      "correct_answer": "D",
+      "explanation": {
+        "A": "Tester involvement during refinement is a standard whole-team practice, not a contingency measure for product owner absence. The whole-team model requires continuous tester participation in collaborative story preparation, not conditional involvement. This option undermines the preventive quality benefit that early tester engagement provides.",
+        "B": "Testers participating in refinement focus on identifying testability concerns and clarifying acceptance criteria, not on delivering completed test cases at that stage. Test case creation is an iteration activity that follows refinement. This option misrepresents the type of contribution testers make during the refinement ceremony.",
+        "C": "Story approval is a product owner responsibility, not a tester gatekeeping function. The whole-team approach enables testers to contribute quality insights during collaborative review, not to exercise approval authority over backlog entries. This option misattributes a governance function to the tester role.",
+        "D": "The whole-team approach ensures that testers contribute their quality perspective during early story refinement, enabling testability issues to be resolved before development investment occurs, as per reference section 1.1.2. Early tester involvement prevents defects arising from unclear or untestable acceptance criteria. The other options either assign testing to a later phase or misrepresent the benefit of the whole-team model."
+      }
+    },
+    {
+      "number": 26,
+      "question": "You are a tester on an Agile team that has just completed a sprint delivering a new search feature. During the retrospective, the team identifies that defects in the search function were detected too late in the sprint. Which retrospective outcome BEST represents using this ceremony as a mechanism for process improvement?",
+      "options": {
+        "A": "The team agrees to introduce earlier testing activities for search-related stories in the next sprint to reduce late defect discovery",
+        "B": "The team records the defect count in the sprint report and forwards it to the project manager for review",
+        "C": "The team decides to remove the search feature from the next sprint backlog until defect trends improve",
+        "D": "The product owner is asked to rewrite the acceptance criteria for the search feature before the next sprint"
+      },
+      "correct_answer": "A",
+      "explanation": {
+        "A": "Retrospectives are used to identify process improvement actions that the team commits to implementing in the next iteration, and introducing earlier testing is a direct, actionable response to the identified late defect detection problem, as per reference section 1.2.3. This outcome reflects the retrospective's purpose as a continuous improvement mechanism. The other options either defer action or address symptoms rather than root causes.",
+        "B": "Forwarding defect counts to a project manager for review is a reporting activity, not a process improvement action arising from a retrospective. Retrospectives produce team-owned improvement commitments, not escalation artefacts for external review. This option confuses defect reporting with the improvement-focused intent of the ceremony.",
+        "C": "Removing a feature from the backlog does not address the process failure that caused late defect detection. A retrospective improvement action must target the team's working practices, not the product scope. This option avoids the process problem rather than resolving it through actionable change.",
+        "D": "Asking the product owner to revise acceptance criteria is a backlog refinement action, not a retrospective process improvement. While acceptance criteria quality may have contributed to the defect pattern, a retrospective improvement must change how the team works, not what the product owner writes. This option misidentifies the source of the process failure."
+      }
+    },
+    {
+      "number": 27,
+      "question": "Match each Kanban concept in Column 1 with its correct description in Column 2.\nColumn 1:\n1. Kanban board.\n2. Work-in-progress limit.\n3. Workflow column.\n4. Pull system.\nColumn 2:\nA. Caps the maximum number of concurrent tasks allowed per process stage.\nB. Allows team members to take work only when capacity is available.\nC. A visual tool displaying the state of all work items across process stages.\nD. Represents a defined stage in the team's process through which work items flow.",
+      "options": {
+        "A": "1D, 2B, 3A, 4C",
+        "B": "1A, 2C, 3B, 4D",
+        "C": "1B, 2D, 3C, 4A",
+        "D": "1C, 2A, 3D, 4B"
+      },
+      "correct_answer": "D",
+      "explanation": {
+        "A": "This mapping assigns the workflow column description (D) to the Kanban board (1) and misplaces the WIP limit. The Kanban board is the overarching visual tool, not a process stage representation, which is the role of the workflow column. This combination confuses two structurally distinct Kanban elements.",
+        "B": "This mapping assigns the WIP limit definition (A) to the Kanban board (1) and misplaces the pull system description. Each Kanban concept has a distinct and non-interchangeable definition; swapping descriptions produces factually incorrect pairings. This combination reflects a misunderstanding of the functional differences between Kanban instruments.",
+        "C": "This mapping assigns the pull system description (B) to the Kanban board (1) and incorrectly pairs the WIP limit with an unrelated concept. The pull system is specifically defined by demand-driven work intake, not by visual display. This combination produces at least three incorrect concept-to-description pairings.",
+        "D": "A Kanban board (1) is a visual tool displaying the state of work items (C), a work-in-progress limit (2) caps concurrent tasks per stage (A), a workflow column (3) represents a defined process stage (D), and a pull system (4) allows team members to take work only when capacity is available (B), as per reference section 1.2.1. This mapping correctly aligns each concept with its unique defining characteristic. The other combinations misassign at least one concept to an incorrect description."
+      }
+    },
+    {
+      "number": 28,
+      "question": "You are performing session-based exploratory testing on a newly released inventory management feature. Your test session is scheduled for ninety minutes. Which TWO of the following actions are consistent with a session-based test management approach for this session? (Select TWO)",
+      "options": {
+        "A": "Pause the session every fifteen minutes to write a formal defect report for each observation before continuing",
+        "B": "Define a test charter before starting the session that specifies the mission, feature scope, and types of risks to investigate",
+        "C": "Document session findings, coverage achieved, and time spent in a session note to enable a structured debrief after the session",
+        "D": "Extend the session duration beyond the scheduled time whenever the tester identifies an interesting area to investigate further"
+      },
+      "correct_answer": ["B", "C"],
+      "explanation": {
+        "A": "Interrupting the session every fifteen minutes to write formal defect reports would fragment the exploratory investigation and undermine the time-boxed, continuous nature of session-based test management. Defects observed during the session are recorded in the session note and reported formally after the session concludes during the debrief. This option disrupts the exploratory flow that the approach is designed to preserve.",
+        "B": "Session-based test management requires each exploratory testing session to be initiated with a test charter that defines the mission, scope, and focus areas for the session, as per reference section 3.3.5. The charter provides investigative direction without constraining the tester's adaptive exploration within those boundaries. This is a foundational practice that distinguishes structured exploratory testing from unguided ad hoc testing.",
+        "C": "Session-based test management requires testers to record findings, coverage observations, and session duration in a session sheet or note, which is used during a post-session debrief to communicate results, identify follow-up charters, and support quality reporting, as per reference section 3.3.5. This documentation provides accountability and traceability for exploratory activities and is the primary output mechanism of the approach.",
+        "D": "Session-based test management relies on time-boxing as a core structural element that enables session planning, comparison, and debrief scheduling. Extending sessions indefinitely when interesting areas are found contradicts the bounded, accountable nature of the approach. Additional investigation areas should be captured as charter candidates for subsequent sessions rather than used to justify session extension."
+      }
+    },
+    {
+      "number": 29,
+      "question": "Which of the following BEST defines configuration management in the context of Agile testing?",
+      "options": {
+        "A": "The process of assigning testers to specific user stories during sprint planning to ensure coverage",
+        "B": "A reporting mechanism used to communicate test status and defect trends to stakeholders",
+        "C": "The practice of identifying, controlling, and tracking changes to software work products across the project lifecycle",
+        "D": "A technique for estimating the effort required to test a set of user stories based on story point values"
+      },
+      "correct_answer": "C",
+      "explanation": {
+        "A": "Tester assignment during sprint planning is a resource allocation activity, not configuration management. Configuration management manages the integrity and versioning of work products, not the assignment of team members to tasks. This option misidentifies a planning activity as a configuration management function.",
+        "B": "Test status reporting and defect trend communication are test progress reporting activities, distinct from configuration management. Configuration management focuses on artefact control and versioning, not on status communication. This option describes a reporting function unrelated to the definition being tested.",
+        "C": "Configuration management is defined as the practice of identifying, controlling, and tracking changes to software work products to maintain integrity and traceability throughout the project, as per reference section 2. This definition encompasses version control, change tracking, and artefact integrity management. The other options describe unrelated practices or misattribute the purpose of configuration management.",
+        "D": "Effort estimation using story points is a planning and estimation technique, not configuration management. Configuration management concerns artefact version control and change tracking, not test effort quantification. This option conflates two entirely distinct Agile testing concepts."
+      }
+    },
+    {
+      "number": 30,
+      "question": "Which of the following BEST describes the primary difference between release planning and iteration planning in an Agile project?",
+      "options": {
+        "A": "Release planning and iteration planning are interchangeable terms that describe the same event in Agile projects",
+        "B": "Iteration planning replaces the need for release planning once the product backlog is established",
+        "C": "Release planning defines the overall product scope and timeline, while iteration planning determines which stories will be implemented in the next sprint",
+        "D": "Iteration planning sets the product roadmap, while release planning selects individual test cases for the sprint"
+      },
+      "correct_answer": "C",
+      "explanation": {
+        "A": "Release planning and iteration planning are distinct events operating at different scales and frequencies. Release planning is a higher-level activity addressing product scope across multiple iterations, while iteration planning addresses a single sprint cycle. Treating them as interchangeable removes a fundamental structural distinction in Agile planning.",
+        "B": "Both planning levels remain relevant and complementary throughout an Agile project, regardless of backlog establishment. Release planning provides the strategic frame within which individual iterations are planned. Removing release planning would eliminate the mechanism for aligning delivery milestones with stakeholder and business expectations.",
+        "C": "Release planning operates at the product level, establishing scope, milestones, and delivery timelines across multiple iterations, while iteration planning focuses on selecting and committing to specific user stories for a single sprint, as per reference section 1.2.5. These two planning horizons serve distinct purposes and occur at different cadences. The other options either conflate the two planning levels or reverse their distinguishing characteristics.",
+        "D": "This option reverses the planning horizons by attributing roadmap definition to iteration planning and test case selection to release planning. Roadmap and scope decisions are release-level concerns, while test case selection and story commitment occur at the iteration level. This option conflates the scope and granularity of both planning events."
+      }
+    },
+    {
+      "number": 31,
+      "question": "You are a tester who has recently joined an Agile team. During a sprint planning session, a misunderstanding arises between you and a developer about the scope of a user story. The team lead suggests your interpersonal skills need development to improve collaboration. Which interpersonal skill BEST describes the skill required to resolve this type of collaborative conflict?",
+      "options": {
+        "A": "Proficiency in writing automated test scripts and configuring continuous integration pipelines",
+        "B": "Expertise in formal test estimation techniques such as planning poker and function point analysis",
+        "C": "Ability to design comprehensive test plans that document all testing activities for the sprint",
+        "D": "Active listening and the ability to articulate testing concerns clearly to developers and the product owner during story discussions"
+      },
+      "correct_answer": "D",
+      "explanation": {
+        "A": "Automated scripting and CI configuration are technical skills, not interpersonal competencies. The scenario describes a communication breakdown requiring collaborative conflict resolution, not a technical tooling deficiency. This option addresses a different dimension of the Agile tester skill profile than the one identified in the scenario.",
+        "B": "Estimation techniques are analytical skills applied during planning activities, not interpersonal skills used to resolve collaborative misunderstandings. The scenario requires communication and listening capability, not estimation proficiency. This option misidentifies the skill category needed to address the described situation.",
+        "C": "Test planning documentation is an analytical and organisational activity, not an interpersonal skill. Resolving a collaborative misunderstanding between a tester and developer requires communication-oriented people skills, not written planning artefacts. This option addresses a different aspect of the tester role than the interpersonal competency being assessed.",
+        "D": "Agile testers must possess strong interpersonal skills including active listening and clear communication to resolve scope ambiguities collaboratively with developers and product owners during story refinement and planning, as per reference section 2.3.1. These skills enable the tester to raise concerns constructively and align understanding without creating team friction. The other options either describe technical skills or misidentify the required interpersonal competency."
+      }
+    },
+    {
+      "number": 32,
+      "question": "Match each tester activity in Column 1 with the Agile team role responsibility it supports in Column 2.\nColumn 1:\n1. Reviewing acceptance criteria during story refinement\n2. Reporting defect trends from the current sprint\n3. Contributing to the definition of done for user stories\n4. Coaching team members on test techniques\nColumn 2:\nA. Informs the team's quality status visibility during the sprint\nB. Builds collective testing capability within the team\nC. Supports the product owner's clarity and story quality goals\nD. Establishes shared completion standards across the team",
+      "options": {
+        "A": "1A, 2D, 3B, 4C",
+        "B": "1B, 2C, 3A, 4D",
+        "C": "1D, 2B, 3C, 4A",
+        "D": "1C, 2A, 3D, 4B"
+      },
+      "correct_answer": "D",
+      "explanation": {
+        "A": "This mapping assigns defect trend reporting (2) to a role support function (D) inconsistent with its quality communication purpose and misplaces coaching (4) to an incorrect role dimension (C). Each tester activity maps to a specific team responsibility that this combination fails to reflect accurately. At least two assignments in this option produce incorrect pairings.",
+        "B": "This mapping assigns acceptance criteria review (1) to a role support function (B) that does not correspond to product quality clarity and misplaces the definition of done contribution (3) to an incorrect dimension (A). The correct mapping requires precise alignment between each activity and the team responsibility it serves. This combination introduces multiple misattributions.",
+        "C": "This mapping assigns acceptance criteria review (1) to an unrelated responsibility (D) and misplaces defect trend reporting (2) to a support function (B) inconsistent with its quality communication purpose. All four pairings in this option are incorrect relative to the responsibilities defined for Agile tester activities. This combination represents a systematic misalignment across all four items.",
+        "D": "Reviewing acceptance criteria (1) supports the product owner's clarity and story quality goals (C), reporting defect trends (2) informs the team's quality status visibility (A), contributing to the definition of done (3) establishes shared completion standards (D), and coaching team members on test techniques (4) builds collective testing capability within the team (B), as per reference section 2.3.2. Each activity maps uniquely to a distinct team responsibility dimension. The other combinations misassign at least one activity."
+      }
+    },
+    {
+      "number": 33,
+      "question": "You are a tester on an Agile team that uses a task board to track sprint progress. The product owner asks how the task board helps communicate test progress during the sprint. Which statement BEST describes how a task board supports test progress tracking in an Agile project?",
+      "options": {
+        "A": "Testing tasks appear on the task board only after development tasks are marked complete to preserve the sequential flow of work",
+        "B": "The task board provides a shared, visible representation of testing tasks in progress, completed, and blocked, enabling the team to identify testing bottlenecks in real time",
+        "C": "The task board replaces all written test status reports by providing sufficient visual information for formal stakeholder reporting",
+        "D": "The task board is used exclusively by the product owner to monitor whether acceptance criteria have been met for each story"
+      },
+      "correct_answer": "B",
+      "explanation": {
+        "A": "Agile task boards are designed to reflect concurrent work across development and testing, not sequential phase completion. Restricting testing task visibility to post-development completion would reintroduce a sequential structure that contradicts the integrated Agile working model. This option misrepresents the task board as a phase-gated tracking tool.",
+        "B": "The task board is a key Agile communication tool that makes the state of all work items, including testing tasks, visible to the entire team, enabling immediate identification of blockages and progress gaps, as per reference section 2.2.1. This real-time visibility supports proactive team response to testing delays. The other options either limit the task board's function or misrepresent its role in test communication.",
+        "C": "While task boards provide team-level progress visibility, they do not replace formal stakeholder reporting mechanisms such as burndown charts, test summary reports, or sprint review presentations. Task boards are team coordination tools, not formal reporting artefacts. This option overstates the scope of the task board as a communication tool.",
+        "D": "The task board is a team-wide transparency tool accessible and relevant to all team members, not a product owner-exclusive monitoring instrument. Acceptance criteria verification is tracked through test results and definition of done completion, not solely through the task board. This option incorrectly restricts both the audience and purpose of the task board."
+      }
+    },
+    {
+      "number": 34,
+      "question": "You are a tester on an Agile team using planning poker to estimate the testing effort for stories in the upcoming sprint. The sprint backlog includes a user authentication story, a data export feature, and a notification service. During the planning session, your initial estimate for the authentication story is significantly higher than the developer's estimate. Which action BEST reflects the correct application of planning poker for testing effort estimation in this situation?",
+      "options": {
+        "A": "Explain the testing concerns that drove the higher estimate and re-estimate after the team discusses and aligns on the story's scope and risk",
+        "B": "Accept the developer's lower estimate immediately to avoid slowing down the planning session",
+        "C": "Escalate the estimation disagreement to the Scrum Master for a final decision on the correct estimate",
+        "D": "Average the developer's estimate and the tester's estimate mathematically and use the result as the final story point value"
+      },
+      "correct_answer": "A",
+      "explanation": {
+        "A": "Planning poker requires team members who submit divergent estimates to explain their reasoning before a re-estimate is conducted, enabling the team to identify scope or risk misunderstandings and reach a shared, informed estimate, as per reference section 3.2.2. The tester's higher estimate may reflect testing complexity, acceptance criteria gaps, or integration risks not visible to the developer. Re-estimation after discussion produces a more accurate, risk-adjusted commitment.",
+        "B": "Accepting a divergent estimate without discussion bypasses the core value of planning poker, which is to surface and resolve differing assumptions about scope and complexity. Silent acceptance of a lower estimate may lead to under-allocation of testing effort and sprint commitment failure. Planning poker specifically requires discussion when estimates diverge significantly.",
+        "C": "Planning poker is a team-owned consensus technique; the Scrum Master's role is to facilitate process, not to arbitrate estimation disagreements. Estimation authority rests with the team members who will perform the work, and disagreements are resolved through discussion, not escalation. This option misassigns decision authority in the planning process.",
+        "D": "Mathematical averaging of divergent estimates does not resolve the underlying scope or risk misunderstanding that caused the divergence. Planning poker uses discussion-driven consensus to produce a shared understanding, not arithmetic compromise. Using an average would mask unresolved assumptions that could affect sprint delivery accuracy."
+      }
+    },
+    {
+      "number": 35,
+      "question": "In the test pyramid model, which statement BEST describes the relationship between the levels of automated testing?",
+      "options": {
+        "A": "Service and API tests form the largest base layer because they provide faster feedback than unit tests",
+        "B": "Unit tests form the largest base of the pyramid, service or API tests form the middle layer, and UI tests form the smallest apex",
+        "C": "UI tests form the largest base because they provide the most comprehensive coverage of user behaviour",
+        "D": "All three levels of the pyramid should contain equal numbers of automated tests to ensure balanced coverage"
+      },
+      "correct_answer": "B",
+      "explanation": {
+        "A": "Unit tests form the base of the test pyramid and execute faster than API-level tests, making them the most suitable candidates for the largest layer. API tests occupy the middle position precisely because they are slower than unit tests but faster than UI tests. This option reverses the speed and volume relationship between the base and middle layers.",
+        "B": "The test pyramid model structures automated testing into three levels: a broad base of fast, stable unit tests; a middle layer of service or API tests; and a small apex of slower, more fragile UI tests, as per reference section 3.1.2. This structure recommends maximising automation at the lower levels and minimising GUI-level tests to optimise execution speed and stability. The other options either invert the pyramid or misrepresent its layer composition.",
+        "C": "The test pyramid model explicitly places UI tests at the apex, representing the smallest proportion of automated tests due to their higher maintenance cost and slower execution. Maximising UI tests contradicts the pyramid's efficiency rationale. This option inverts the pyramid structure.",
+        "D": "The test pyramid model prescribes an unequal, tapered distribution with far more unit tests than UI tests. Equal distribution across levels would defeat the pyramid's purpose of optimising feedback speed and test stability. This option misrepresent the pyramid as a symmetric model."
+      }
+    },
+    {
+      "number": 36,
+      "question": "You are refining a user story with your team. The proposed story reads: \"As an administrator, I want to generate usage reports so that I can monitor system activity.\" During refinement, the team realises they cannot estimate the story because the reporting scope is entirely undefined. Which INVEST criterion is MOST at risk in this story due to the undefined scope preventing estimation?",
+      "options": {
+        "A": "Small, because the story is too large to complete within a single sprint",
+        "B": "Estimable, because the team cannot size the story for sprint commitment without a defined reporting scope",
+        "C": "Valuable, because the story does not specify which stakeholders benefit from the reports",
+        "D": "Independent, because the story depends on other reporting features not yet defined"
+      },
+      "correct_answer": "B",
+      "explanation": {
+        "A": "The stem does not indicate that the story is too large; it identifies undefined scope as the cause of estimation failure. The Small criterion addresses story size relative to sprint capacity, not the presence or absence of scope definition. This option conflates scope ambiguity with story size, which are distinct INVEST concerns.",
+        "B": "The Estimable criterion of INVEST requires that a story be understood well enough for the team to assign a relative size estimate for planning purposes, as per reference section 1.2.2. When reporting scope is entirely undefined, the team lacks the information needed to estimate effort, making sprint commitment impossible. The clarifying qualifier in the stem ensures Estimable is the unambiguous primary risk, distinguishing it from Testable.",
+        "C": "The story does include a stated value proposition: enabling the administrator to monitor system activity. While the value could be articulated more precisely, the stem identifies estimation incapacity as the primary failure symptom, not stakeholder benefit ambiguity. This option targets a different INVEST criterion than the one explicitly at risk.",
+        "D": "The stem does not indicate dependencies on other stories or features; the risk identified is the team's inability to estimate due to undefined scope. Independence concerns arise when a story cannot be developed without completion of another story, which is not the issue described. This option misattributes the failure symptom to a different INVEST dimension."
+      }
+    },
+    {
+      "number": 37,
+      "question": "You are a tester on an Agile team that has completed five sprints. The regression test suite has grown significantly and now takes several hours to execute. A developer suggests disabling some regression tests to speed up the pipeline. Which response BEST explains why test automation is important for managing regression risk in this situation?",
+      "options": {
+        "A": "Automated regression tests should be replaced with manual exploratory sessions each sprint to maintain testing freshness and avoid stale coverage",
+        "B": "Regression risk in Agile projects is managed by requiring developers to re-test all previously implemented stories manually before each sprint review",
+        "C": "The regression test suite should be archived at the end of each sprint and rebuilt from scratch to ensure tests remain aligned with the latest product state",
+        "D": "Automated regression tests enable the team to continuously verify existing functionality without increasing manual testing effort as the product grows across iterations"
+      },
+      "correct_answer": "D",
+      "explanation": {
+        "A": "Replacing automated regression tests with manual exploratory sessions would fail to provide the repeatable, systematic coverage required to protect against regressions as the product grows. Exploratory testing complements automation by targeting new and uncertain areas, not by replacing repeatable regression verification. This option removes the efficiency benefit that automation provides for regression risk management.",
+        "B": "Requiring full manual re-testing of all implemented stories before each sprint review is impractical as the product grows and contradicts the purpose of automated regression suites. Manual regression testing cannot scale at the same rate as automated testing across multiple iterations. This option proposes a labour-intensive approach that automation is specifically designed to replace.",
+        "C": "Rebuilding the regression suite from scratch each sprint discards validated test coverage and defeats the cumulative quality protection that regression testing provides across iterations. The regression suite should evolve incrementally, with tests added for new features and retiring only those no longer relevant. This option misrepresents regression suite management as a periodic rebuild activity.",
+        "D": "The core value of automated regression testing in Agile is its ability to provide continuous verification of previously implemented features without proportionally increasing manual testing effort, which is essential as the codebase grows across multiple iterations, as per reference section 2.2.2. Disabling regression tests to improve speed removes the safety net protecting against undetected regressions. The other options either misstate the value of automation or propose approaches that increase quality risk."
+      }
+    },
+    {
+      "number": 38,
+      "question": "You are working on an Agile team where all members, including testers and developers, share a common workspace. A manager proposes splitting the team across two office floors to accommodate growth. Which benefit of co-location and collaboration BEST supports keeping the team in a shared workspace?",
+      "options": {
+        "A": "Shared workspace guarantees equal contribution from all team members regardless of role boundaries",
+        "B": "Co-location allows the team to bypass the product owner during sprint planning by self-organising story selection",
+        "C": "Co-location enables informal, real-time communication that reduces misunderstandings and accelerates defect resolution",
+        "D": "Co-located teams eliminate the need for sprint ceremonies since all coordination happens informally"
+      },
+      "correct_answer": "C",
+      "explanation": {
+        "A": "Physical proximity does not automatically ensure equal contribution; team norms, facilitation, and role clarity are additional factors that influence collaborative balance. Co-location facilitates communication but does not govern contribution levels across roles. This option incorrectly attributes a behavioural guarantee to a physical arrangement.",
+        "B": "The product owner's participation in sprint planning is a Scrum requirement that co-location does not override. The product owner is responsible for backlog prioritisation and story selection input regardless of team proximity. This option misrepresents the product owner's role in the planning ceremony.",
+        "C": "Co-location supports the whole-team approach by enabling spontaneous, synchronous communication among all team members, which reduces the latency and misinterpretation risk associated with distributed working, as per reference section 1.1.2. Proximity allows testers and developers to resolve ambiguities and defects without scheduling delays. The other options either overstate co-location benefits or misattribute outcomes unrelated to the collaboration model.",
+        "D": "Sprint ceremonies serve structured purposes, including planning, review, and retrospective, that informal co-located communication cannot replace. Co-location enhances the effectiveness of these events but does not substitute for them. Eliminating ceremonies would remove the structured cadence that Agile frameworks require for team alignment."
+      }
+    },
+    {
+      "number": 39,
+      "question": "You are a tester on an Agile team that uses a burndown chart to track sprint progress. At the midpoint of the sprint, the burndown chart shows that the remaining work is significantly above the ideal trend line. Which action BEST represents using the burndown chart as a test status communication tool in this situation?",
+      "options": {
+        "A": "Raise the deviation as a testing impediment during the daily standup and propose adjusting scope or effort to align with the sprint goal",
+        "B": "Wait until the end of the sprint to review the burndown chart before deciding whether to report the deviation",
+        "C": "Update the burndown chart to reflect the ideal trend line by adjusting the baseline so the deviation is no longer visible",
+        "D": "Escalate the burndown deviation directly to the product owner and request that additional team members be added to the sprint"
+      },
+      "correct_answer": "A",
+      "explanation": {
+        "A": "Burndown charts are used to communicate testing progress and product quality status, and a significant deviation from the ideal trend line at sprint midpoint should be raised as an impediment in the daily standup to enable team-level response, as per reference section 2.2.1. This action uses the chart as an active communication tool rather than a passive observation. The other options either defer action or misuse the burndown data.",
+        "B": "Waiting until sprint end to act on a midpoint deviation removes the opportunity for the team to adjust effort or scope in time to meet the sprint goal. Burndown charts are designed to provide real-time visibility that enables proactive response, not retrospective reporting. Deferring action on a visible negative trend undermines the communication purpose of the tool.",
+        "C": "Manipulating the baseline to eliminate visible deviation falsifies the team's progress status and removes the transparency that burndown charts are designed to provide. Accurate burndown data enables honest stakeholder communication and informed team decision-making. Altering the baseline to hide deviation is a quality reporting integrity failure.",
+        "D": "Escalating directly to the product owner and requesting resource additions bypasses the team's own problem-solving responsibility and daily standup communication mechanism. The first response to a burndown deviation is a team-level discussion to assess root cause and identify corrective options before escalation. Resource additions are a structural decision that requires broader consensus, not an immediate response to a midpoint trend deviation."
+      }
+    },
+    {
+      "number": 40,
+      "question": "Which of the following BEST defines a test charter in the context of Agile exploratory testing?",
+      "options": {
+        "A": "A comprehensive list of step-by-step test procedures to be followed during a scripted test session",
+        "B": "A report summarising the defects found and coverage achieved during a completed testing session",
+        "C": "A documented statement of the scope and mission that guides an exploratory testing session",
+        "D": "A formal test plan approved by the project manager before exploratory testing can begin"
+      },
+      "correct_answer": "C",
+      "explanation": {
+        "A": "A test charter is specifically designed for exploratory testing, where tester judgement and adaptive investigation replace scripted step-by-step procedures. Detailed procedural scripts define scripted testing, not exploratory sessions. This option misidentifies the charter as a scripted test procedure, which contradicts its purpose.",
+        "B": "A test charter is a pre-session planning artefact that guides exploration, not a post-session reporting document. The session sheet or debrief note captures findings and coverage after the session completes. This option confuses a planning input with a reporting output.",
+        "C": "A test charter is defined as a statement of the scope, objectives, and mission that provides direction for an exploratory testing session without over-constraining the tester's investigation, as per reference section 3. This definition distinguishes the charter as a guiding artefact rather than a scripted test procedure. The other options describe unrelated test artefacts or misattribute the purpose of the charter.",
+        "D": "A test charter is a lightweight, tester-defined guiding statement, not a formally approved management document. Exploratory testing charters are created to direct individual sessions, not to satisfy project governance approval requirements. This option conflates a test charter with a formal test plan artefact."
+      }
+    }
+  ]
+}
+
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  var raw = JSON.parse(document.getElementById('quiz-data').textContent);
+  var ORIGINAL_QUESTIONS = raw.questions.slice();
+  document.getElementById('examTitle').textContent = raw.title;
+
+  var STORAGE_KEY = 'agileTesterFlashcards_v1';
+  var state = {
+    order: ORIGINAL_QUESTIONS.map(function(q,i){ return i; }),
+    current: 0,
+    answers: {},
+    bookmarks: {},
+    dark: false,
+    reviewMode: false,
+    questionStartTime: Date.now()
+  };
+
+  function loadState(){
+    try{
+      var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      if(saved){
+        state.answers = saved.answers || {};
+        state.bookmarks = saved.bookmarks || {};
+        state.dark = !!saved.dark;
+        if(saved.order && saved.order.length === ORIGINAL_QUESTIONS.length){
+          state.order = saved.order;
+        }
+        if(typeof saved.current === 'number') state.current = saved.current;
+      }
+    }catch(e){}
+  }
+  function saveState(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        answers: state.answers,
+        bookmarks: state.bookmarks,
+        dark: state.dark,
+        order: state.order,
+        current: state.current
+      }));
+    }catch(e){}
+  }
+
+  loadState();
+  if(state.dark) document.documentElement.classList.add('dark');
+
+  var mainArea = document.getElementById('mainArea');
+
+  function isMulti(q){ return Array.isArray(q.correct_answer); }
+  function correctSet(q){ return isMulti(q) ? q.correct_answer.slice() : [q.correct_answer]; }
+  function optionKeys(q){ return Object.keys(q.options); }
+
+  function formatExplanationText(t){
+    var esc = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    esc = esc.replace(/"([^"]+)"/g, '&ldquo;$1&rdquo;');
+    return esc;
+  }
+
+  function renderStats(){
+    // Stats summary and progress strip UI removed per user request.
+    // State tracking (state.answers, finalCorrect, etc.) is preserved
+    // for the review-mode "missed questions" feature.
+  }
+
+  function goTo(idx){
+    if(idx < 0 || idx >= state.order.length) return;
+    state.current = idx;
+    state.questionStartTime = Date.now();
+    saveState();
+    render();
+  }
+
+  function buildExplanation(q, selectedKeys){
+    var wrap = document.createElement('div');
+    wrap.className = 'explain';
+    wrap.id = 'explainBox';
+    var inner = document.createElement('div');
+    inner.className = 'explain-inner';
+    var title = document.createElement('p');
+    title.className = 'explain-title';
+    title.innerHTML = '<i class="ti ti-bulb"></i> Explanation';
+    inner.appendChild(title);
+
+    var keysOrder = optionKeys(q);
+    var corrSet = correctSet(q);
+    keysOrder.forEach(function(k){
+      if(!q.explanation[k]) return;
+      var isC = corrSet.indexOf(k) !== -1;
+      var p = document.createElement('p');
+      p.className = 'explain-block ' + (isC ? 'is-correct' : 'is-wrong');
+      p.innerHTML = '<b class="opt-letter">' + k + '.</b>' + formatExplanationText(q.explanation[k]);
+      inner.appendChild(p);
+    });
+    wrap.appendChild(inner);
+    return wrap;
+  }
+
+  function render(){
+    if(state.reviewMode){ renderReview(); return; }
+    renderStats();
+
+    var qi = state.order[state.current];
+    var q = ORIGINAL_QUESTIONS[qi];
+    var saved = state.answers[qi];
+    var multi = isMulti(q);
+    var corrSet = correctSet(q);
+
+    mainArea.innerHTML = '';
+
+    var zone = document.createElement('div');
+    zone.className = 'cardzone';
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'flashcard-' + qi;
+
+    // top row
+    var top = document.createElement('div');
+    top.className = 'card-top';
+    top.innerHTML =
+      '<span class="qnum">Question <b>' + (state.current+1) + '</b> of ' + state.order.length + '</span>';
+    var tagrow = document.createElement('div');
+    tagrow.className = 'tagrow';
+    if(multi){
+      var tag = document.createElement('span');
+      tag.className = 'tag multi';
+      tag.textContent = 'Select ' + corrSet.length;
+      tagrow.appendChild(tag);
+    }
+    var bm = document.createElement('button');
+    bm.className = 'bookmark-btn' + (state.bookmarks[qi] ? ' on' : '');
+    bm.innerHTML = '<i class="ti ' + (state.bookmarks[qi] ? 'ti-bookmark-filled' : 'ti-bookmark') + '"></i>';
+    bm.setAttribute('aria-label','Bookmark this question');
+    bm.onclick = function(){
+      state.bookmarks[qi] = !state.bookmarks[qi];
+      saveState();
+      render();
+    };
+    tagrow.appendChild(bm);
+    top.appendChild(tagrow);
+    card.appendChild(top);
+
+    var qtext = document.createElement('p');
+    qtext.className = 'question';
+    qtext.textContent = q.question;
+    card.appendChild(qtext);
+
+    var optsWrap = document.createElement('div');
+    optsWrap.className = 'options';
+    card.appendChild(optsWrap);
+
+    var attemptNote = document.createElement('p');
+    attemptNote.className = 'attempt-note';
+    card.appendChild(attemptNote);
+
+    var localState = saved ? Object.assign({}, saved) : {
+      attempts: 0,
+      locked: false,
+      finalCorrect: false,
+      selectedMulti: [],
+      revealed: false
+    };
+
+    function persistAndStats(){
+      state.answers[qi] = localState;
+      saveState();
+      renderStats();
+    }
+
+    function showExplanation(){
+      var old = card.querySelector('#explainBox');
+      if(old) old.remove();
+      var box = buildExplanation(q, []);
+      card.appendChild(box);
+      requestAnimationFrame(function(){
+        box.classList.add('open');
+      });
+      var ctl = card.querySelector('.controlsrow');
+      if(ctl) ctl.remove();
+    }
+
+    function lockSingle(key, opts){
+      var isCorrect = corrSet.indexOf(key) !== -1;
+      localState.attempts = (localState.attempts||0) + 1;
+      opts.forEach(function(o){
+        o.classList.add('locked');
+        var k = o.getAttribute('data-key');
+        if(k === key){
+          o.classList.add(isCorrect ? 'correct' : 'incorrect');
+        }
+      });
+      if(isCorrect){
+        localState.locked = true;
+        localState.finalCorrect = true;
+        localState.chosenKey = key;
+        persistAndStats();
+        showExplanation();
+      } else {
+        var wrongOpt = null;
+        opts.forEach(function(o){ if(o.getAttribute('data-key')===key) wrongOpt = o; });
+        if(wrongOpt){
+          wrongOpt.classList.add('shake');
+          setTimeout(function(){ wrongOpt.classList.remove('shake'); }, 420);
+        }
+        if(localState.attempts >= 2){
+          localState.locked = true;
+          localState.finalCorrect = false;
+          localState.chosenKey = key;
+          opts.forEach(function(o){
+            var k = o.getAttribute('data-key');
+            if(corrSet.indexOf(k) !== -1){ o.classList.add('correct'); }
+          });
+          attemptNote.textContent = 'Correct answer revealed above.';
+          attemptNote.classList.add('show');
+          persistAndStats();
+          showExplanation();
+        } else {
+          opts.forEach(function(o){
+            var k = o.getAttribute('data-key');
+            if(k === key){
+              o.classList.remove('locked');
+              o.classList.add('faded');
+            }
+          });
+          attemptNote.textContent = 'Not quite — option ' + key + ' is incorrect. Give it one more try.';
+          attemptNote.classList.add('show');
+          persistAndStats();
+        }
+      }
+    }
+
+    if(!multi){
+      var optEls = [];
+      optionKeys(q).forEach(function(k){
+        var btn = document.createElement('button');
+        btn.className = 'opt';
+        btn.setAttribute('data-key', k);
+        btn.innerHTML =
+          '<span class="letter">' + k + '</span>' +
+          '<span class="otext"></span>' +
+          '<span class="markicon"><i class="ti"></i></span>';
+        btn.querySelector('.otext').textContent = q.options[k];
+        optEls.push(btn);
+        optsWrap.appendChild(btn);
+
+        if(localState.locked){
+          btn.classList.add('locked');
+          if(k === localState.chosenKey && !localState.finalCorrect){
+            btn.classList.add('incorrect');
+          }
+          if(corrSet.indexOf(k) !== -1){
+            btn.classList.add('correct');
+          }
+        } else if(localState.attempts >= 1 && k === localState.chosenKey){
+          btn.classList.add('faded');
+        }
+
+        btn.onclick = function(){
+          if(localState.locked) return;
+          lockSingle(k, optEls);
+        };
+      });
+      if(localState.locked){
+        attemptNote.textContent = localState.finalCorrect ? '' :
+          (localState.attempts >= 2 ? 'Correct answer revealed above.' : '');
+        if(attemptNote.textContent) attemptNote.classList.add('show');
+      }
+    } else {
+      var selected = localState.selectedMulti || [];
+      var optEls2 = [];
+      optionKeys(q).forEach(function(k){
+        var btn = document.createElement('button');
+        btn.className = 'opt';
+        btn.setAttribute('data-key', k);
+        btn.innerHTML =
+          '<span class="letter">' + k + '</span>' +
+          '<span class="otext"></span>' +
+          '<span class="markicon"><i class="ti"></i></span>';
+        btn.querySelector('.otext').textContent = q.options[k];
+        optEls2.push(btn);
+        optsWrap.appendChild(btn);
+
+        if(localState.locked){
+          btn.classList.add('locked');
+          var wasSelected = selected.indexOf(k) !== -1;
+          var isC = corrSet.indexOf(k) !== -1;
+          if(isC){ btn.classList.add('correct'); }
+          else if(wasSelected){ btn.classList.add('incorrect'); }
+        } else {
+          if(selected.indexOf(k) !== -1) btn.classList.add('selectedMulti');
+          btn.onclick = function(){
+            var i = selected.indexOf(k);
+            if(i === -1) selected.push(k); else selected.splice(i,1);
+            localState.selectedMulti = selected;
+            persistAndStats();
+            render();
+          };
+        }
+      });
+
+      var controls = document.createElement('div');
+      controls.className = 'controlsrow';
+      if(!localState.locked){
+        var checkBtn = document.createElement('button');
+        checkBtn.className = 'btn primary';
+        checkBtn.textContent = 'Check answer';
+        checkBtn.disabled = selected.length === 0;
+        checkBtn.onclick = function(){
+          var setA = selected.slice().sort().join(',');
+          var setB = corrSet.slice().sort().join(',');
+          var ok = setA === setB;
+          localState.locked = true;
+          localState.finalCorrect = ok;
+          persistAndStats();
+          render();
+        };
+        controls.appendChild(checkBtn);
+      }
+      card.appendChild(controls);
+    }
+
+    if(localState.locked){
+      var box2 = buildExplanation(q, []);
+      box2.classList.add('open');
+      card.appendChild(box2);
+    }
+
+    zone.appendChild(card);
+    mainArea.appendChild(zone);
+
+    // nav
+    var nav = document.createElement('div');
+    nav.className = 'navrow';
+    var prevBtn = document.createElement('button');
+    prevBtn.className = 'navbtn';
+    prevBtn.innerHTML = '<i class="ti ti-arrow-left"></i><span class="label">Previous</span>';
+    prevBtn.disabled = state.current === 0;
+    prevBtn.onclick = function(){ goTo(state.current - 1); };
+
+    var mid = document.createElement('div');
+    mid.className = 'navmid';
+    var answeredCount = Object.keys(state.answers).length;
+    mid.textContent = answeredCount + ' / ' + state.order.length + ' answered';
+
+    var nextBtn = document.createElement('button');
+    nextBtn.className = 'navbtn';
+    nextBtn.innerHTML = '<span class="label">Next</span><i class="ti ti-arrow-right"></i>';
+    nextBtn.disabled = state.current >= state.order.length - 1;
+    nextBtn.onclick = function(){ goTo(state.current + 1); };
+
+    nav.appendChild(prevBtn);
+    nav.appendChild(mid);
+    nav.appendChild(nextBtn);
+    mainArea.appendChild(nav);
+
+    persistAndStats();
+  }
+
+  function renderReview(){
+    renderStats();
+    mainArea.innerHTML = '';
+    var header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;';
+    header.innerHTML = '<p style="font-family:var(--serif);font-size:18px;font-weight:500;margin:0;">Review · missed questions</p>';
+    var backBtn = document.createElement('button');
+    backBtn.className = 'btn';
+    backBtn.textContent = 'Back to deck';
+    backBtn.onclick = function(){ state.reviewMode = false; render(); };
+    header.appendChild(backBtn);
+    mainArea.appendChild(header);
+
+    var missedIdx = [];
+    state.order.forEach(function(qi, idx){
+      var a = state.answers[qi];
+      if(a && !a.finalCorrect) missedIdx.push(idx);
+    });
+
+    if(missedIdx.length === 0){
+      var empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.innerHTML = '<i class="ti ti-circle-check"></i>No missed questions yet — keep going, or come back here after a full pass.';
+      mainArea.appendChild(empty);
+      return;
+    }
+
+    var list = document.createElement('div');
+    list.className = 'review-list';
+    missedIdx.forEach(function(idx){
+      var qi = state.order[idx];
+      var q = ORIGINAL_QUESTIONS[qi];
+      var item = document.createElement('div');
+      item.className = 'review-item';
+      item.innerHTML =
+        '<span class="ri-badge">Q' + (idx+1) + '</span>' +
+        '<span class="ri-text"><span class="rq">Tap to revisit</span>' + q.question.slice(0,140) + (q.question.length>140?'…':'') + '</span>';
+      item.onclick = function(){
+        state.reviewMode = false;
+        goTo(idx);
+      };
+      list.appendChild(item);
+    });
+    mainArea.appendChild(list);
+  }
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  document.getElementById('shuffleBtn').onclick = function(){
+    state.order = shuffle(ORIGINAL_QUESTIONS.map(function(q,i){return i;}));
+    state.current = 0;
+    state.reviewMode = false;
+    saveState();
+    render();
+  };
+  document.getElementById('reviewBtn').onclick = function(){
+    state.reviewMode = !state.reviewMode;
+    document.getElementById('reviewBtn').classList.toggle('active', state.reviewMode);
+    render();
+  };
+  document.getElementById('darkBtn').onclick = function(){
+    state.dark = !state.dark;
+    document.documentElement.classList.toggle('dark', state.dark);
+    document.getElementById('darkBtn').classList.toggle('active', state.dark);
+    saveState();
+  };
+  if(state.dark) document.getElementById('darkBtn').classList.add('active');
+
+  render();
+})();
+</script>
+</body>
+</html>
