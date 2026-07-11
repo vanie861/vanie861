@@ -305,6 +305,33 @@ html.dark .card{ box-shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 32px -16px rgba(0,0
 
 .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 
+/* ===== Passphrase gate ===== */
+.gate{
+  position:fixed; inset:0; z-index:50;
+  display:flex; align-items:center; justify-content:center;
+  padding:24px; background:var(--paper);
+}
+.gate-card{
+  width:100%; max-width:380px;
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius-lg);
+  padding:30px 28px; text-align:center;
+  box-shadow:0 1px 2px rgba(0,0,0,.04), 0 12px 28px -16px rgba(20,20,15,.18);
+}
+.gate-card .eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--accent); margin:0 0 6px;
+}
+.gate-card h2{ font-family:var(--serif); font-weight:500; font-size:22px; margin:0 0 8px; color:var(--ink); }
+.gate-sub{ font-size:13.5px; line-height:1.55; color:var(--ink-soft); margin:0 0 20px; }
+.gate-card input{
+  width:100%; font-family:var(--sans); font-size:15px; color:var(--ink);
+  background:var(--card); border:1px solid var(--line-strong); border-radius:var(--radius-md);
+  padding:11px 13px; margin-bottom:12px; transition:border-color .15s ease;
+}
+.gate-card input:focus{ border-color:var(--accent); outline:none; }
+.gate-card .btn.primary{ width:100%; padding:11px; font-size:14.5px; }
+.gate-err{ font-size:12.5px; color:var(--bad-deep); margin:12px 0 0; min-height:1em; }
+
 @media (max-width:520px){
   .wrap{ padding:18px 14px 70px; }
   .brand h1{ font-size:21px; }
@@ -324,6 +351,18 @@ html.dark .card{ box-shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 32px -16px rgba(0,0
 </head>
 <body>
 <div class="bg-texture"></div>
+
+<div id="gate" class="gate">
+  <form id="gateForm" class="gate-card" autocomplete="off">
+    <p class="eyebrow">CTFL-AT · Locked</p>
+    <h2>Enter passphrase</h2>
+    <p class="gate-sub">This practice set is protected. Enter the passphrase to load the questions.</p>
+    <input id="gatePass" type="password" autocomplete="current-password" placeholder="Passphrase" aria-label="Passphrase">
+    <button type="submit" id="gateBtn" class="btn primary">Unlock</button>
+    <p id="gateErr" class="gate-err" role="alert"></p>
+  </form>
+</div>
+
 <h1 class="sr-only">ISTQB Agile Tester flashcard quiz with progress tracking, explanations, bookmarks and a review mode for missed questions.</h1>
 
 <div class="wrap">
@@ -349,10 +388,77 @@ html.dark .card{ box-shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 32px -16px rgba(0,0
 </div>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css">
-<script src="data/questions.js"></script>
 
 <script>
+// ===== Passphrase gate =====
+// The questions ship to the browser as the encrypted blob data/questions.js.enc
+// (openssl aes-256-cbc + pbkdf2). They are decrypted here, in the browser, only
+// after the user supplies the correct passphrase. Nothing readable appears in
+// DevTools without it, and the passphrase is never stored in the code.
+// NOTE: crypto.subtle needs a secure context — open via https:// or http://localhost,
+// not file://.
 (function(){
+  "use strict";
+  var SESSION_KEY = 'agileTester_pass_v1';
+  var gate = document.getElementById('gate');
+  var form = document.getElementById('gateForm');
+  var input = document.getElementById('gatePass');
+  var btn = document.getElementById('gateBtn');
+  var errEl = document.getElementById('gateErr');
+
+  // Decrypt an `openssl enc -aes-256-cbc -pbkdf2 -salt` blob.
+  // Layout: "Salted__" (8) + salt (8) + ciphertext. Key+IV derived via
+  // PBKDF2-HMAC-SHA256, 10000 iterations (openssl defaults).
+  async function decryptOpenSSL(buf, password){
+    var bytes = new Uint8Array(buf);
+    var magic = String.fromCharCode.apply(null, bytes.subarray(0,8));
+    if(magic !== 'Salted__') throw new Error('Unexpected data format.');
+    var salt = bytes.subarray(8,16);
+    var ct = bytes.subarray(16);
+    var baseKey = await crypto.subtle.importKey(
+      'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+    var bits = await crypto.subtle.deriveBits(
+      { name:'PBKDF2', salt:salt, iterations:10000, hash:'SHA-256' }, baseKey, 384);
+    var derived = new Uint8Array(bits);
+    var key = await crypto.subtle.importKey(
+      'raw', derived.subarray(0,32), { name:'AES-CBC' }, false, ['decrypt']);
+    var plain = await crypto.subtle.decrypt(
+      { name:'AES-CBC', iv:derived.subarray(32,48) }, key, ct);
+    return new TextDecoder().decode(plain);
+  }
+
+  async function tryUnlock(password){
+    errEl.textContent = '';
+    btn.disabled = true; btn.textContent = 'Unlocking…';
+    try{
+      if(!crypto || !crypto.subtle) throw new Error('This browser can’t decrypt here. Open the site over https or localhost.');
+      var resp = await fetch('data/questions.js.enc', { cache:'no-store' });
+      if(!resp.ok) throw new Error('Could not load question data.');
+      var text = await decryptOpenSSL(await resp.arrayBuffer(), password);
+      if(text.indexOf('QUIZ_DATA') === -1) throw new Error('bad passphrase');
+      var s = document.createElement('script');
+      s.text = text;                 // executes synchronously, sets window.QUIZ_DATA
+      document.body.appendChild(s);
+      if(!window.QUIZ_DATA) throw new Error('bad passphrase');
+      try{ sessionStorage.setItem(SESSION_KEY, password); }catch(e){}
+      gate.parentNode.removeChild(gate);
+      startQuiz();
+    }catch(e){
+      try{ sessionStorage.removeItem(SESSION_KEY); }catch(_){}
+      btn.disabled = false; btn.textContent = 'Unlock';
+      errEl.textContent = (e && /https|localhost/.test(e.message)) ? e.message : 'Incorrect passphrase — try again.';
+      input.value = ''; input.focus();
+    }
+  }
+
+  form.addEventListener('submit', function(e){ e.preventDefault(); if(input.value) tryUnlock(input.value); });
+
+  var remembered = null;
+  try{ remembered = sessionStorage.getItem(SESSION_KEY); }catch(e){}
+  if(remembered){ tryUnlock(remembered); } else { input.focus(); }
+})();
+
+function startQuiz(){
   "use strict";
 
   var raw = window.QUIZ_DATA;
@@ -820,7 +926,7 @@ html.dark .card{ box-shadow:0 1px 2px rgba(0,0,0,.3), 0 16px 32px -16px rgba(0,0
   };
 
   render();
-})();
+}
 </script>
 </body>
 </html>
