@@ -547,6 +547,18 @@ function startQuiz(){
   function correctSet(q){ return isMulti(q) ? q.correct_answer.slice() : [q.correct_answer]; }
   function optionKeys(q){ return Object.keys(q.options); }
 
+  // A question counts as "answered" only once its answer is committed (locked) —
+  // not merely because it was viewed. Guards the nav counter and review list
+  // against blank state that older builds persisted just from rendering.
+  function isAnswered(a){ return !!(a && a.locked); }
+  function countAnswered(){
+    var n = 0;
+    for(var k in state.answers){
+      if(state.answers.hasOwnProperty(k) && isAnswered(state.answers[k])) n++;
+    }
+    return n;
+  }
+
   function formatExplanationText(t){
     var esc = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     esc = esc.replace(/"([^"]+)"/g, '&ldquo;$1&rdquo;');
@@ -835,8 +847,7 @@ function startQuiz(){
 
     var mid = document.createElement('div');
     mid.className = 'navmid';
-    var answeredCount = Object.keys(state.answers).length;
-    mid.textContent = answeredCount + ' / ' + state.order.length + ' answered';
+    mid.textContent = countAnswered() + ' / ' + state.order.length + ' answered';
 
     var nextBtn = document.createElement('button');
     nextBtn.className = 'navbtn';
@@ -849,7 +860,9 @@ function startQuiz(){
     nav.appendChild(nextBtn);
     mainArea.appendChild(nav);
 
-    persistAndStats();
+    // Persist navigation position only. Do NOT write an answer entry here —
+    // that would mark a merely-viewed question as answered.
+    saveState();
   }
 
   function renderReview(){
@@ -868,7 +881,7 @@ function startQuiz(){
     var missedIdx = [];
     state.order.forEach(function(qi, idx){
       var a = state.answers[qi];
-      if(a && !a.finalCorrect) missedIdx.push(idx);
+      if(isAnswered(a) && !a.finalCorrect) missedIdx.push(idx);
     });
 
     if(missedIdx.length === 0){
