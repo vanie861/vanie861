@@ -462,12 +462,15 @@ function startQuiz(){
   "use strict";
 
   var raw = window.QUIZ_DATA;
-  var EXAMS = raw.exams.slice();
+  var EXAM_NAME = 'IST-5K';
+  var EXAMS = raw.exams.map(function(ex){
+    return { title: ex.title.replace('ISTQB Agile Tester (CTFL-AT)', EXAM_NAME), questions: ex.questions };
+  });
   // Prepend a combined deck containing every question from all exams.
   var _allQ = [];
   EXAMS.forEach(function(ex){ ex.questions.forEach(function(q){ _allQ.push(q); }); });
   EXAMS.unshift({
-    title: 'IST5K (' + _allQ.length + ')',
+    title: EXAM_NAME + ' (' + _allQ.length + ')',
     questions: _allQ
   });
   var STORAGE_PREFIX = 'agileTesterFlashcards_v4_';
@@ -928,7 +931,7 @@ function startQuiz(){
   EXAMS.forEach(function(ex, i){
     var o = document.createElement('option');
     o.value = i;
-    o.textContent = ex.title.replace('IST5K ', '');
+    o.textContent = ex.title.replace(EXAM_NAME + ' ', '');
     examSelect.appendChild(o);
   });
   examSelect.value = globalPref.examIndex;
